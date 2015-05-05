@@ -1,0 +1,13 @@
+include *.py
+include *.rst
+include *.txt
+include LICENSE
+include pytest.ini
+include tox.ini
+recursive-include docs *.bat
+recursive-include docs *.py
+recursive-include docs *.rst
+recursive-include docs Makefile
+recursive-include invenio_groups *.html
+recursive-include invenio_groups *.js
+recursive-include tests *.py

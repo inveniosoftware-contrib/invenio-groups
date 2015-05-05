@@ -20,10 +20,11 @@
 """WebAccount User Settings"""
 
 from flask import url_for
-from invenio.base.i18n import _
 
-from invenio.ext.template import render_template_to_string
 from flask_login import current_user
+
+from invenio.base.i18n import _
+from invenio.ext.template import render_template_to_string
 from invenio.modules.account.models import UserUsergroup
 from invenio.modules.dashboard.settings import Settings
 
@@ -35,13 +36,13 @@ class WebGroupSettings(Settings):
         self.icon = 'tags'
         self.title = _('Group')
         self.view = url_for('webgroup.index')
-        #self.edit = url_for('webgroup.edit', name=self.name)
+        # self.edit = url_for('webgroup.edit', name=self.name)
 
     def widget(self):
         uid = current_user.get_id()
         usergroups = UserUsergroup.query.filter(
             UserUsergroup.id_user == uid
-            ).all()
+        ).all()
 
         template = """
 {%- if usergroups -%}
@@ -67,8 +68,8 @@ class WebGroupSettings(Settings):
     @property
     def is_authorized(self):
         return current_user.is_authenticated() and \
-               current_user.is_authorized('usegroups')
+            current_user.is_authorized('usegroups')
 
 # Compulsory plugin interface
 settings = WebGroupSettings
-#__all__ = ['WebMessageSettings']
+# __all__ = ('WebMessageSettings', )

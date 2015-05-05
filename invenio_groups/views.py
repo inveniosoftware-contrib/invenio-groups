@@ -165,7 +165,7 @@ def leave(id_usergroup, id_user=None):
 
     current_user.reload()
     flash(_('%(user)s left the group "%(name)s".',
-            user='User "'+user2remove.nickname+'"' if id_user else "You",
+            user='User "' + user2remove.nickname + '"' if id_user else "You",
             name=group.name), 'success')
     if id_user and id_user != current_user.get_id():
         return redirect(url_for('.members', id_usergroup=id_usergroup))
@@ -187,7 +187,7 @@ def join(id_usergroup, id_user=None, status=None):
     form = UserJoinGroupForm()
     user_status = None
     if form.user_status and form.user_status.data:
-            user_status = UserUsergroup.USER_STATUS['ADMIN']
+        user_status = UserUsergroup.USER_STATUS['ADMIN']
 
     try:
         group.join(user2join, status=user_status)
@@ -198,8 +198,9 @@ def join(id_usergroup, id_user=None, status=None):
             x_nickname=user2join.nickname, x_groupname=group.name), "error")
         return redirect(url_for('.index'))
     except SQLAlchemyError:
-        flash(_('User "%(x_nickname)s" can\'t join the group "%(x_groupname)s"',
-                x_nickname=user2join.nickname, x_groupname=group.name), "error")
+        flash(_(
+            'User "%(x_nickname)s" can\'t join the group "%(x_groupname)s"',
+            x_nickname=user2join.nickname, x_groupname=group.name), "error")
         if id_user:
             return redirect(url_for('.members', id_usergroup=id_usergroup))
         else:
@@ -207,7 +208,7 @@ def join(id_usergroup, id_user=None, status=None):
 
     current_user.reload()
     flash(_('%(user)s join the group "%(name)s".',
-            user='User "'+user2join.nickname+'"' if id_user else "You",
+            user='User "' + user2join.nickname + '"' if id_user else "You",
             name=group.name), 'success')
 
     redirect_url = form.redirect_url.data or url_for('.index')
