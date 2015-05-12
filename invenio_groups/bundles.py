@@ -19,7 +19,7 @@
 
 """Group bundles."""
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
 from invenio.base.bundles import invenio as _i, jquery as _j
 from invenio.ext.assets import Bundle, RequireJSFilter
@@ -28,5 +28,12 @@ js = Bundle(
     'js/groups/init.js',
     filters=RequireJSFilter(exclude=[_j, _i]),
     output="groups.js",
+    weight=50
+)
+
+styles = Bundle(
+    "css/groups/groups.less",
+    filters="less,cleancss",
+    output="groups.css",
     weight=50
 )

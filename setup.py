@@ -28,16 +28,27 @@ readme = open('README.rst').read()
 history = open('CHANGES.rst').read()
 
 requirements = [
-    'Flask',
-    'six',
-    'Invenio',
+    'blinker>=1.3.0',
+    'Flask-Breadcrumbs>=0.2',
+    'Flask-Login>=0.2.7',
+    'Flask-Menu>=0.2',
+    'Flask-Registry>=0.2',
+    'Flask>=0.10.1',
+    'Invenio>=2.0.0',
+    'mock>=1.0.1',
+    'six>=1.7.2',
+    'SQLAlchemy-Utils[encrypted]>=0.30.1',
+    'SQLAlchemy>=1.0',
+    'wtforms-alchemy>=0.13.1',
+    'WTForms>=2.0.1',
 ]
 
 test_requirements = [
-    'pytest',
-    'pytest-cov',
-    'pytest-pep8',
-    'coverage',
+    'coverage>=3.7.1',
+    'Flask-Testing>=0.4.1',
+    'pytest-cov>=1.8.1',
+    'pytest-pep8>=1.0.6',
+    'pytest>=2.7.0',
 ]
 
 
@@ -99,9 +110,10 @@ setup(
     install_requires=requirements,
     extras_require={
         'docs': [
-            'Sphinx',
-            'sphinx_rtd_theme'
+            'Sphinx>=1.3',
+            'sphinx_rtd_theme>=0.1.7',
         ],
+        'test': test_requirements,
     },
     classifiers=[
         'Environment :: Web Environment',

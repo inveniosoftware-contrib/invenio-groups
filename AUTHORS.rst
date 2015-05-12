@@ -43,3 +43,6 @@ Contact us at `info@invenio-software.org
 - Samuele Kaplun <samuele.kaplun@cern.ch>
 - Tibor Simko <tibor.simko@cern.ch>
 - Yoan Blanc <yoan.blanc@cern.ch>
+- Adrian Pawel Baran <adrian.pawel.baran@cern.ch>
+- Lars Holm Nielsen <lars.holm.nielsen@cern.ch>
+- Konstantinos Kostis <konstantinos.kostis@cern.ch>

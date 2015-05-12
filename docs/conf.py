@@ -26,7 +26,7 @@ import shlex
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath(os.path.join('..', '..')))
+sys.path.insert(0, os.path.abspath(os.path.join('..', 'invenio_groups')))
 sys.path.insert(0, os.path.abspath(os.path.join('_ext')))
 
 import ultramock
@@ -64,13 +64,11 @@ project = u'Invenio Groups'
 copyright = u'2015, CERN'
 author = u'CERN'
 
-# The version info for the project you're documenting, acts as replacement for
-# |version| and |release|, also used in various other places throughout the
-# built documents.
-#
-# The short X.Y version.
-import invenio_groups.version
-version = invenio_groups.version.__version__
+# Get the version string.  Cannot be done with import!
+g = {}
+with open(os.path.join('..', 'invenio_groups', 'version.py'), 'rt') as fp:
+    exec(fp.read(), g)
+    version = g['__version__']
 # The full version, including alpha/beta/rc tags.
 release = version
 

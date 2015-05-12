@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#
 # This file is part of Invenio.
 # Copyright (C) 2014, 2015 CERN.
 #
@@ -17,7 +19,4 @@
 
 """Groups parameters."""
 
-from __future__ import unicode_literals
-
-"""Specify how many suggestion returns for autocomplete fields."""
-GROUPS_AUTOCOMPLETE_LIMIT = 10
+from __future__ import absolute_import, print_function, unicode_literals

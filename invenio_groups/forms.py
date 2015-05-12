@@ -19,70 +19,73 @@
 
 """Group Forms."""
 
+
+from __future__ import absolute_import, print_function, unicode_literals
+
 from invenio.base.i18n import _
-from invenio.modules.accounts.models import Usergroup
-from invenio.utils.forms import InvenioBaseForm, RemoteAutocompleteField
+from invenio.utils.forms import InvenioBaseForm
 
-from wtforms import validators, widgets
-from wtforms.fields import BooleanField, HiddenField
+from sqlalchemy_utils.types.choice import ChoiceType
 
-from wtforms_alchemy import model_form_factory
+from wtforms import RadioField, TextAreaField
+from wtforms.validators import DataRequired, Email, StopValidation, \
+    ValidationError
+from wtforms_alchemy import ClassMap, model_form_factory
+
+from .models import Group
+
 
 ModelForm = model_form_factory(InvenioBaseForm)
 
 
-class UsergroupForm(ModelForm):
+class EmailsValidator(object):
 
-    """Create new Usergroup."""
+    """Validates TextAreaField containing emails.
+
+    Runs DataRequired validator on whole field and additionaly for each email
+    parsed it runs Email validator.
+    """
+
+    def __init__(self):
+        """Initalize all used validators."""
+        self.validate_data = DataRequired()
+        self.validate_email = Email()
+
+    def __call__(self, form, field):
+        """Parse emails and run validators."""
+        self.validate_data(form, field)
+
+        emails_org = field.data
+        emails = filter(None, emails_org.splitlines())
+        for email in emails:
+            try:
+                field.data = email
+                self.validate_email(form, field)
+            except (ValidationError, StopValidation):
+                raise ValidationError('Invalid email: ' + email)
+            finally:
+                field.data = emails_org
+
+
+class GroupForm(ModelForm):
+
+    """Form for creating and updating a group."""
 
     class Meta:
-
-        """Meta class model for *WTForms-Alchemy*."""
-
-        model = Usergroup
-        strip_string_fields = True
-        field_args = dict(
-            name=dict(
-                label=_('Name'),
-                validators=[validators.DataRequired()],
-                widget=widgets.TextInput(),
-            ),
-            description=dict(label=_('Description')),
-            join_policy=dict(label=_('Join policy')),
-            login_method=dict(label=_('Login method'))
-        )
+        model = Group
+        type_map = ClassMap({ChoiceType: RadioField})
+        exclude = [
+            'is_managed',
+        ]
 
 
-class JoinUsergroupForm(InvenioBaseForm):
+class NewMemberForm(InvenioBaseForm):
 
-    """Join existing group."""
+    """For for adding new members to a group."""
 
-    id_usergroup = RemoteAutocompleteField(
-        # without label
-        '',
-        remote='',
-        min_length=1,
-        highlight='true',
-        data_key='id',
-        data_value='name'
+    emails = TextAreaField(
+        description=_(
+            'Required. Provide list of the emails of the users'
+            ' you wish to be added. Put each email in new line.'),
+        validators=[EmailsValidator()]
     )
-
-
-class UserJoinGroupForm(InvenioBaseForm):
-
-    """Select a user that Join an existing group."""
-
-    id_usergroup = HiddenField()
-    id_user = RemoteAutocompleteField(
-        # without label
-        '',
-        remote='',
-        min_length=3,
-        highlight='true',
-        data_key='id',
-        data_value='nickname'
-    )
-    # set as admin of the group
-    user_status = BooleanField(label=_('as Admin'))
-    # return page
-    redirect_url = HiddenField()
