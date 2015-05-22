@@ -19,6 +19,8 @@
 
 """Define groups views."""
 
+from __future__ import absolute_import, print_function, unicode_literals
+
 from .settings import blueprint as groups_settings_blueprint
 
 

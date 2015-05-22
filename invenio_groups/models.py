@@ -39,8 +39,8 @@ from sqlalchemy.sql.expression import asc, desc
 from sqlalchemy_utils import generic_relationship
 from sqlalchemy_utils.types.choice import ChoiceType
 
-from .widgets import RadioGroupWidget
 from .signals import group_created, group_deleted
+from .widgets import RadioGroupWidget
 
 
 class SubscriptionPolicy(object):
@@ -407,7 +407,7 @@ class Group(db.Model):
         return None
 
     def invite_by_emails(self, emails):
-        """Invite a users to a group by emails.
+        """Invite users to a group by emails.
 
         :param list emails: Emails of users that shall be invited.
         :returns: Newly created Membership or None.
@@ -442,11 +442,9 @@ class Group(db.Model):
         :param admin: Admin to be checked.
         :returns: True or False.
         """
-        is_admin = False
-        ga = GroupAdmin.get(self, admin)
-        if ga is not None:
-            is_admin = True
-        return is_admin
+        if GroupAdmin.get(self, admin) is not None:
+            return True
+        return False
 
     def is_member(self, user, with_pending=False):
         """Verify if given user is a group member.
@@ -455,14 +453,13 @@ class Group(db.Model):
         :param bool with_pending: Whether to include pending users or not.
         :returns: True or False.
         """
-        is_member = False
         m = Membership.get(self, user)
         if m is not None:
             if with_pending:
-                is_member = True
+                return True
             elif m.state == MembershipState.ACTIVE:
-                is_member = True
-        return is_member
+                return True
+        return False
 
     def can_see_members(self, user):
         """Determine if given user can see other group members.
@@ -494,7 +491,7 @@ class Membership(db.Model):
         MembershipState.PENDING_USER: _("Pending member approval"),
         MembershipState.ACTIVE: _("Active"),
     }
-    """MembershipState choices."""
+    """Membership state choices."""
 
     __tablename__ = 'groupMEMBER'
 
@@ -532,7 +529,7 @@ class Membership(db.Model):
 
     @classmethod
     def get(cls, group, user):
-        """Get Membership for given user and group.
+        """Get membership for given user and group.
 
         :param group: Group object.
         :param user: User object.
@@ -574,7 +571,7 @@ class Membership(db.Model):
     @classmethod
     def query_requests(cls, admin, eager=False):
         """Get all pending group requests."""
-        # get direct pending request
+        # Get direct pending request
         q1 = GroupAdmin.query_by_admin(admin).with_entities(
             GroupAdmin.group_id)
         q2 = Membership.query.filter(
@@ -582,7 +579,7 @@ class Membership(db.Model):
             Membership.id_group.in_(q1),
         )
 
-        # get request from admin groups your are member of
+        # Get request from admin groups your are member of
         q3 = Membership.query_by_user(
             user=admin, state=MembershipState.ACTIVE
         ).with_entities(Membership.id_group)

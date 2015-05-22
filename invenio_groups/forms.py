@@ -19,7 +19,6 @@
 
 """Group Forms."""
 
-
 from __future__ import absolute_import, print_function, unicode_literals
 
 from invenio.base.i18n import _

@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Invenio; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """Invenio module that adds support for user groups."""
 
 import os
@@ -53,6 +54,7 @@ test_requirements = [
 
 
 class PyTest(TestCommand):
+
     """PyTest Test."""
 
     user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
@@ -96,7 +98,7 @@ setup(
     version=version,
     description=__doc__,
     long_description=readme + '\n\n' + history,
-    keywords='invenio TODO',
+    keywords='invenio groups',
     license='GPLv2',
     author='CERN',
     author_email='info@invenio-software.org',

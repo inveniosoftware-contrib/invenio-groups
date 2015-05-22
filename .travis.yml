@@ -32,7 +32,9 @@ cache:
 
 env:
   - REQUIREMENTS=lowest REXTRAS=docs,test
-  - REQUIREMENTS=release REXTRAS=docs,test
+  # Temporary disable release requirements until new Invenio version has been
+  # release:
+  #- REQUIREMENTS=release REXTRAS=docs,test
   - REQUIREMENTS=devel REXTRAS=docs,test
 
 python:
