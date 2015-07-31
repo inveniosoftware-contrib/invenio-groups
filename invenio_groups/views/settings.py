@@ -34,7 +34,8 @@ from flask_menu import register_menu
 from invenio.base.decorators import wash_arguments
 from invenio.base.i18n import _
 from invenio.ext.principal import permission_required
-from invenio.modules.accounts.models import User
+
+from invenio_accounts.models import User
 
 from sqlalchemy.exc import IntegrityError
 

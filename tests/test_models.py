@@ -35,7 +35,7 @@ class BaseTestCase(InvenioTestCase):
     def setUp(self):
         """Clear tables."""
         from invenio_groups.models import Group, Membership, GroupAdmin
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
 
         Group.query.delete()
         Membership.query.delete()
@@ -199,7 +199,7 @@ class GroupTestCase(BaseTestCase):
     def test_delete(self):
         """Test deletion of a group."""
         from invenio_groups.models import Group, GroupAdmin, Membership
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
 
         g1 = Group.create(name="test1")
         g2 = Group.create(name="test2", admins=[g1])
@@ -288,7 +288,7 @@ class GroupTestCase(BaseTestCase):
         """."""
         from invenio_groups.models import Group, Membership, \
             GroupAdmin, MembershipState
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
 
         u1 = User(email="test1@test1.test1", password="test1")
         u2 = User(email="test2@test2.test2", password="test2")
@@ -350,7 +350,7 @@ class GroupTestCase(BaseTestCase):
     def test_add_member(self):
         """."""
         from invenio_groups.models import Group, Membership
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
 
         g = Group.create(name="test1")
         u = User(email="test@test.test", password="test")
@@ -369,7 +369,7 @@ class GroupTestCase(BaseTestCase):
     def test_remove_member(self):
         """."""
         from invenio_groups.models import Group, Membership
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
 
         g = Group.create(name="test1")
         u = User(email="test@test.test", password="test")
@@ -389,7 +389,7 @@ class GroupTestCase(BaseTestCase):
         """."""
         from invenio_groups.models import Group, Membership, \
             MembershipState
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
 
         g = Group.create(name="test")
         u = User(email="test", password="test")
@@ -413,7 +413,7 @@ class GroupTestCase(BaseTestCase):
         """."""
         from invenio_groups.models import Group, SubscriptionPolicy, \
             Membership, MembershipState
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
 
         g_o = Group.create(name="test_open",
                            subscription_policy=SubscriptionPolicy.OPEN)
@@ -437,7 +437,7 @@ class GroupTestCase(BaseTestCase):
     def test_is_admin(self):
         """."""
         from invenio_groups.models import Group
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
 
         g = Group.create(name="test")
         u = User(email="test", password="test")
@@ -455,7 +455,7 @@ class GroupTestCase(BaseTestCase):
     def test_is_member(self):
         """."""
         from invenio_groups.models import Group
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
 
         g = Group.create(name="test")
         u = User(email="test", password="test")
@@ -474,7 +474,7 @@ class MembershipTestCase(BaseTestCase):
         """."""
         from invenio_groups.models import Group, Membership, \
             MembershipState
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
 
         g = Group.create(name="test")
         u = User(email="test@test.test", password="test")
@@ -492,7 +492,7 @@ class MembershipTestCase(BaseTestCase):
     def test_delete(self):
         """."""
         from invenio_groups.models import Group, Membership
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
 
         g = Group.create(name="test")
         u = User(email="test@test.test", password="test")
@@ -508,7 +508,7 @@ class MembershipTestCase(BaseTestCase):
     def test_get(self):
         """."""
         from invenio_groups.models import Group, Membership
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
 
         g = Group.create(name="test")
         u = User(email="test@test.test", password="test")
@@ -529,7 +529,7 @@ class MembershipTestCase(BaseTestCase):
         """."""
         from invenio_groups.models import Group, Membership, \
             MembershipState
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         from flask.ext.sqlalchemy import BaseQuery
 
         g = Group.create(name="test")
@@ -549,7 +549,7 @@ class MembershipTestCase(BaseTestCase):
         """."""
         from invenio_groups.models import Group, Membership, \
             MembershipState
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         from flask.ext.sqlalchemy import BaseQuery
 
         g = Group.create(name="test")
@@ -571,7 +571,7 @@ class MembershipTestCase(BaseTestCase):
         """."""
         from invenio_groups.models import Group, Membership, \
             MembershipState
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         from flask.ext.sqlalchemy import BaseQuery
 
         a = User(email="admin@admin.admin", password="admin")
@@ -603,7 +603,7 @@ class MembershipTestCase(BaseTestCase):
         """."""
         from invenio_groups.models import Group, Membership, \
             MembershipState
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         from flask.ext.sqlalchemy import BaseQuery
 
         g = Group.create(name="test")
@@ -623,7 +623,7 @@ class MembershipTestCase(BaseTestCase):
         """."""
         from invenio_groups.models import Group, Membership, \
             MembershipState
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
 
         g = Group.create(name="test")
         u = User(email="test@test.test", password="test")
@@ -638,7 +638,7 @@ class MembershipTestCase(BaseTestCase):
     def test_reject(self):
         """."""
         from invenio_groups.models import Group, Membership
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
 
         g = Group.create(name="test")
         u = User(email="test@test.test", password="test")
