@@ -95,7 +95,7 @@ with open(os.path.join('invenio_groups', 'version.py'), 'rt') as fp:
     version = g['__version__']
 
 setup(
-    name='Invenio Groups',
+    name='invenio-groups',
     version=version,
     description=__doc__,
     long_description=readme + '\n\n' + history,
@@ -125,13 +125,14 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
-        'Topic :: Software Development :: Libraries :: Python Modules'
+        'Topic :: Software Development :: Libraries :: Python Modules',
         "Programming Language :: Python :: 2",
         # 'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         # 'Programming Language :: Python :: 3',
         # 'Programming Language :: Python :: 3.3',
         # 'Programming Language :: Python :: 3.4',
+        'Development Status :: 1 - Planning',
     ],
     tests_require=test_requirements,
     cmdclass={'test': PyTest},
