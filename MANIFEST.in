@@ -1,6 +1,7 @@
 include *.py
 include *.rst
 include *.txt
+include .editorconfig .travis.invenio.cfg
 include LICENSE
 include pytest.ini
 include tox.ini
@@ -10,4 +11,9 @@ recursive-include docs *.rst
 recursive-include docs Makefile
 recursive-include invenio_groups *.html
 recursive-include invenio_groups *.js
+recursive-include invenio_groups *.less
+recursive-include invenio_groups *.mo
+recursive-include invenio_groups *.po
+recursive-include invenio_groups *.pot
+recursive-include invenio_groups *.py
 recursive-include tests *.py
