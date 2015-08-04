@@ -17,7 +17,7 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Version information for Invenio Groups.
+"""Version information for Invenio-Groups.
 
 This file is imported by ``invenio_groups.__init__``,
 and parsed by ``setup.py``.
@@ -25,4 +25,4 @@ and parsed by ``setup.py``.
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-__version__ = "0.1.1"
+__version__ = "0.1.2.dev20150804"
