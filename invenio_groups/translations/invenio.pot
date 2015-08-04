@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: invenio-groups 0.1.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-08-04 11:49+0200\n"
+"POT-Creation-Date: 2015-08-04 19:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -108,6 +108,49 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
+#: invenio_groups/templates/groups/helpers_base.html:32
+msgid "Search"
+msgstr ""
+
+#: invenio_groups/templates/groups/new_base.html:31
+#: invenio_groups/views/settings.py:219 invenio_groups/views/settings.py:222
+msgid "Members"
+msgstr ""
+
+#: invenio_groups/templates/groups/new_base.html:50
+#: invenio_groups/templates/groups/new_base.html:83
+msgid "Delete"
+msgstr ""
+
+#: invenio_groups/templates/groups/new_base.html:54
+msgid "Update"
+msgstr ""
+
+#: invenio_groups/templates/groups/new_base.html:54
+msgid "Create"
+msgstr ""
+
+#: invenio_groups/templates/groups/new_base.html:57
+#: invenio_groups/templates/groups/new_base.html:79
+msgid "Cancel"
+msgstr ""
+
+#: invenio_groups/templates/groups/new_base.html:68
+msgid "Group deletion"
+msgstr ""
+
+#: invenio_groups/templates/groups/new_base.html:71
+msgid "You are about to "
+msgstr ""
+
+#: invenio_groups/templates/groups/new_base.html:72
+msgid "delete"
+msgstr ""
+
+#: invenio_groups/templates/groups/new_base.html:75
+msgid "This action cannot be undone. Are you sure you want to proceed?"
+msgstr ""
+
 #: invenio_groups/views/settings.py:67
 #, python-format
 msgid "%(icon)s My Groups"
@@ -150,10 +193,6 @@ msgstr ""
 #: invenio_groups/views/settings.py:211
 #, python-format
 msgid "Successfully removed group \"%(group_name)s\""
-msgstr ""
-
-#: invenio_groups/views/settings.py:219 invenio_groups/views/settings.py:222
-msgid "Members"
 msgstr ""
 
 #: invenio_groups/views/settings.py:265

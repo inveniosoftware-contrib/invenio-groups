@@ -1,4 +1,4 @@
-# Spanish translations for invenio-groups.
+# German translations for invenio-groups.
 # Copyright (C) 2015 ORGANIZATION
 # This file is distributed under the same license as the invenio-groups
 # project.
@@ -9,9 +9,9 @@ msgstr ""
 "Project-Id-Version: invenio-groups 0.1.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2015-08-04 19:57+0200\n"
-"PO-Revision-Date: 2015-08-04 11:49+0200\n"
+"PO-Revision-Date: 2015-08-04 19:58+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: es <LL@li.org>\n"
+"Language-Team: de <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
