@@ -46,3 +46,4 @@ Contact us at `info@invenio-software.org
 - Adrian Pawel Baran <adrian.pawel.baran@cern.ch>
 - Lars Holm Nielsen <lars.holm.nielsen@cern.ch>
 - Konstantinos Kostis <konstantinos.kostis@cern.ch>
+- Charlotte Cattaneo <ciris.cattaneo@gmail.com>
