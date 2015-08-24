@@ -22,7 +22,7 @@
 from datetime import datetime
 
 from invenio.ext.sqlalchemy import db
-from invenio.modules.upgrader.api import op
+from invenio_upgrader.api import op
 
 
 # Important: Below is only a best guess. You MUST validate which previous
