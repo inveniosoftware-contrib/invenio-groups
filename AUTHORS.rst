@@ -23,13 +23,15 @@
 Authors
 =======
 
-Invenio Groups is a module developed for the `Invenio
+Invenio-Groups is a module developed for the `Invenio
 <http://invenio-software.org>`_ digital library software.
 
 Contact us at `info@invenio-software.org
 <mailto:info@invenio-software.org>`_.
 
+- Adrian Pawel Baran <adrian.pawel.baran@cern.ch>
 - Benoit Thiell <bthiell@cfa.harvard.edu>
+- Charlotte Cattaneo <ciris.cattaneo@gmail.com>
 - Diane Berkovits <diane.berkovits@cern.ch>
 - Eirini Psallida <eirini.psallida@cern.ch>
 - Gregory Favre <gregory.favre@cern.ch>
@@ -38,12 +40,11 @@ Contact us at `info@invenio-software.org
 - Jerome Caffaro <jerome.caffaro@cern.ch>
 - Jiri Kuncar <jiri.kuncar@cern.ch>
 - Kamil Neczaj <kamil.neczaj@cern.ch>
+- Konstantinos Kostis <konstantinos.kostis@cern.ch>
+- Lars Holm Nielsen <lars.holm.nielsen@cern.ch>
 - Leonardo Rossi <leonardo.r@cern.ch>
+- Marco Neumann <marco@crepererum.net>
 - Raquel Jimenez Encinar <raquel.jimenez.encinar@cern.ch>
 - Samuele Kaplun <samuele.kaplun@cern.ch>
 - Tibor Simko <tibor.simko@cern.ch>
 - Yoan Blanc <yoan.blanc@cern.ch>
-- Adrian Pawel Baran <adrian.pawel.baran@cern.ch>
-- Lars Holm Nielsen <lars.holm.nielsen@cern.ch>
-- Konstantinos Kostis <konstantinos.kostis@cern.ch>
-- Charlotte Cattaneo <ciris.cattaneo@gmail.com>

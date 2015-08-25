@@ -6,9 +6,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: invenio-groups 0.1.1\n"
+"Project-Id-Version: invenio-groups 0.1.2\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-08-04 19:57+0200\n"
+"POT-Creation-Date: 2015-08-25 18:50+0200\n"
 "PO-Revision-Date: 2015-08-04 19:58+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"

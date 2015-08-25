@@ -1,8 +1,8 @@
 =======================
- Invenio-Groups v0.1.1
+ Invenio-Groups v0.1.2
 =======================
 
-Invenio-Groups v0.1.1 was released on August 4, 2015.
+Invenio-Groups v0.1.2 was released on August 25, 2015.
 
 About
 -----
@@ -14,17 +14,18 @@ Invenio module that adds support for user groups.
 Bug fixes
 ---------
 
-- Removes dependency on Invenio legacy package.
+- Adds missing `invenio_upgrader` dependency and amends past upgrade
+  recipes following its separation into standalone package.
 
 Installation
 ------------
 
-   $ pip install invenio-groups==0.1.1
+   $ pip install invenio-groups==0.1.2
 
 Documentation
 -------------
 
-   http://invenio-groups.readthedocs.org/en/v0.1.1
+   http://invenio-groups.readthedocs.org/en/v0.1.2
 
 Happy hacking and thanks for flying Invenio-Groups.
 

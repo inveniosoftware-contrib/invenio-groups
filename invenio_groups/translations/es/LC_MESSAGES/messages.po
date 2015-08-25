@@ -6,19 +6,17 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: invenio-groups 0.1.1\n"
+"Project-Id-Version: invenio-groups 0.1.2\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-08-04 19:57+0200\n"
+"POT-Creation-Date: 2015-08-25 18:50+0200\n"
 "PO-Revision-Date: 2015-08-04 16:00+0200\n"
+"Last-Translator: \n"
 "Language-Team: es <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.0\n"
-"Last-Translator: \n"
-"Language: es\n"
-"X-Generator: Poedit 1.8.3\n"
 
 #: invenio_groups/forms.py:86
 msgid ""
@@ -230,3 +228,4 @@ msgstr "Ha rechazado invitación a grupo %(name)s."
 #: invenio_groups/views/settings.py:364
 msgid "Requests sent!"
 msgstr "Solicitudes enviadas!"
+
