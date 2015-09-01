@@ -54,9 +54,9 @@
       <th class="col-md-4">{{ _("Email") }}</th>
       <th class="col-md-3">
         {%- if s == "asc" %}
-        <a href="{{ url_for('.members', group_id=group.id, s='desc') }}"><i class="fa fa-fw fa-sort-asc"></i>{{ _("Status") }}</a>
+        <a href="{{ url_for('.members', group_id=group.id, s='desc') }}"><i class="fa fa-fw fa-sort-asc"></i> {{ _("Status") }}</a>
         {%- else %}
-        <a href="{{ url_for('.members', group_id=group.id, s='asc') }}"><i class="fa fa-fw fa-sort-desc"></i>{{ _("Status") }}</a>
+        <a href="{{ url_for('.members', group_id=group.id, s='asc') }}"><i class="fa fa-fw fa-sort-desc"></i> {{ _("Status") }}</a>
         {%- endif %}
       </th>
       <th class="col-md-2"></th>

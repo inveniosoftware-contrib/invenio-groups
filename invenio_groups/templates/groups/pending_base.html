@@ -75,14 +75,14 @@
         {%- else %}
         <button class="btn btn-xs btn-danger pull-right" form="reject-form" formmethod="POST" formaction="{{ url_for('.reject', group_id=membership.group.id) }}">
         {%- endif %}
-          <i class="fa fa-fw fa-chain-broken"></i>{{ _("Reject") }}
+          <i class="fa fa-fw fa-chain-broken"></i> {{ _("Reject") }}
         </button>
         {%- if requests %}
         <button class="btn btn-xs btn-success pull-right" form="approve-form" formmethod="POST" formaction="{{ url_for('.approve', group_id=membership.group.id, user_id=membership.user.id) }}">
         {%- else %}
         <button class="btn btn-xs btn-success pull-right" form="accept-form" formmethod="POST" formaction="{{ url_for('.accept',  group_id=membership.group.id) }}">
         {%- endif %}
-          <i class="fa fa-fw fa-link"></i>{{ _("Accept") }}
+          <i class="fa fa-fw fa-link"></i> {{ _("Accept") }}
         </button>
       </td>
     </tr>

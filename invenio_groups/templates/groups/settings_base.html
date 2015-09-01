@@ -43,9 +43,9 @@
   <hr>
   <div class="btn-toolbar">
     <a class="btn btn-primary btn-sm pull-right" href="{{ url_for('.invitations') }}">
-      <i class="fa fa-fw fa-envelope"></i>{{ _("Invitations") }} <span class="badge">{{ invitations }}</span></a>
+      <i class="fa fa-fw fa-envelope"></i> {{ _("Invitations") }} <span class="badge">{{ invitations }}</span></a>
     <a class="btn btn-primary btn-sm pull-right" href="{{ url_for('.requests') }}">
-      <i class="fa fa-fw fa-reply"></i>{{ _("Requests") }} <span class="badge">{{ requests }}</span></a>
+      <i class="fa fa-fw fa-reply"></i> {{ _("Requests") }} <span class="badge">{{ requests }}</span></a>
   </div>
 </div>
 {%- if groups.items|length == 0 and not q %}
@@ -88,15 +88,15 @@
           {%- endif %}
           {%- if group.is_admin(current_user) %}
           <a class="btn btn-xs btn-default pull-right" href="{{ url_for('.manage',  group_id=group.id) }}">
-            <i class="fa fa-fw fa fa-wrench"></i>{{ _("Manage") }}
+            <i class="fa fa-fw fa fa-wrench"></i> {{ _("Manage") }}
           </a>
           <a class="btn btn-xs btn-default pull-right" href="{{ url_for('.new_member', group_id=group.id) }}">
-            <i class="fa fa-fw fa fa-plus"></i>{{ _("Invite") }}
+            <i class="fa fa-fw fa fa-plus"></i> {{ _("Invite") }}
           </a>
           {%- endif %}
           {%- if group.can_see_members(current_user) %}
           <a class="btn btn-xs btn-default pull-right" href="{{ url_for('.members', group_id=group.id) }}">
-            <i class="fa fa-fw fa-users"></i>{{ _("Members") }}
+            <i class="fa fa-fw fa-users"></i> {{ _("Members") }}
           </a>
           {%- endif %}
         </td>
