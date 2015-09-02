@@ -35,7 +35,7 @@ requirements = [
     'Flask-Menu>=0.2',
     'Flask-Registry>=0.2',
     'Flask>=0.10.1',
-    'invenio-accounts>=0.1.0',
+    'invenio-accounts>=0.1.2',
     'mock>=1.0.1',
     'six>=1.7.2',
     'SQLAlchemy-Utils[encrypted]>=0.30.1',
@@ -46,11 +46,12 @@ requirements = [
 ]
 
 test_requirements = [
-    'coverage>=3.7.1',
     'Flask-Testing>=0.4.1',
+    'coverage>=3.7.1',
     'pytest-cov>=1.8.1',
     'pytest-pep8>=1.0.6',
     'pytest>=2.7.0',
+    'unittest2>=1.1.0',
 ]
 
 
@@ -116,7 +117,7 @@ setup(
             'Sphinx>=1.3',
             'sphinx_rtd_theme>=0.1.7',
         ],
-        'test': test_requirements,
+        'tests': test_requirements,
     },
     classifiers=[
         'Environment :: Web Environment',

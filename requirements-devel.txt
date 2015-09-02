@@ -14,12 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Invenio; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-#
-# TODO: Add development versions of some important dependencies here to get a
-#       warning when there are breaking upstream changes, e.g.:
-#
-#     -e git+git://github.com/mitsuhiko/werkzeug.git#egg=Werkzeug
-#     -e git+git://github.com/mitsuhiko/jinja2.git#egg=Jinja2
 
+-e git+git://github.com/inveniosoftware/invenio-accounts.git#egg=invenio-accounts
 -e git+git://github.com/inveniosoftware/invenio-upgrader.git#egg=invenio-upgrader
--e git+https://github.com/inveniosoftware/invenio.git@master#egg=Invenio

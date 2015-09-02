@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,12 +17,16 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+
 notifications:
   email: false
+
+sudo: false
 
 services:
   - mysql
   - redis
+  - elasticsearch
 
 language: python
 
@@ -31,20 +35,16 @@ cache:
   - pip
 
 env:
-  - REQUIREMENTS=lowest REXTRAS=docs,test
-  # Temporary disable release requirements until new Invenio version has been
-  # release:
-  #- REQUIREMENTS=release REXTRAS=docs,test
-  - REQUIREMENTS=devel REXTRAS=docs,test
+  - REQUIREMENTS=lowest REXTRAS=docs,tests
+  - REQUIREMENTS=release REXTRAS=docs,tests
+  - REQUIREMENTS=devel REXTRAS=docs,tests
 
 python:
   - "2.7"
 
 before_install:
-  - "sudo apt-get update"
-  - "sudo apt-get install python-dev"
   - "travis_retry pip install --upgrade pip"
-  - "travis_retry pip install mock"
+  - "travis_retry pip install mock twine wheel coveralls"
   - "python requirements.py --extras=$REXTRAS --level=min > .travis-lowest-requirements.txt"
   - "python requirements.py --extras=$REXTRAS --level=pypi > .travis-release-requirements.txt"
   - "python requirements.py --extras=$REXTRAS --level=dev > .travis-devel-requirements.txt"
@@ -52,13 +52,13 @@ before_install:
   - "cp .travis.invenio.cfg ${VIRTUAL_ENV}/var/invenio.base-instance/invenio.cfg"
 
 install:
-  - "travis_retry pip install unittest2"
-  - "travis_retry pip install -r .travis-$REQUIREMENTS-requirements.txt --allow-all-external --quiet"
-  - "travis_retry pip install -e .[$REXTRAS] --quiet --process-dependency-links"
+  - "travis_retry pip install -e git+https://github.com/inveniosoftware/invenio#egg=invenio"
+  - "travis_retry pip install -r .travis-$REQUIREMENTS-requirements.txt --allow-all-external"
+  - "travis_retry pip install -e .[$REXTRAS]"
 
 before_script:
   - "inveniomanage database init --yes-i-know"
-  - "inveniomanage database create"
+  - "inveniomanage database create --quiet"
 
 script:
   - "sphinx-build -qnN docs docs/_build/html"
@@ -66,3 +66,13 @@ script:
 
 after_success:
   - coveralls
+
+deploy:
+  provider: pypi
+  user: jirikuncar
+  password:
+    secure: jzg+Ko4I8ASmEPr4Yn8hST3MzTIKz16Vk2nnPlJHhFWs7Gqp3BI9NITwAHGQMJlzSur6KOPzfAmJ59b+Xu+yhPFAi0eXXJIYy1RUwe95Jki+SG2sK/DIFA27II7xK+0OT7EUGQDEjP3lrjd0wmh4QVIyjmkjdfJYlbDElu1KbC4=
+  distributions: "compile_catalog sdist bdist_wheel"
+  on:
+    tags: true
+    python: "2.7"
