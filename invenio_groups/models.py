@@ -468,12 +468,61 @@ class Group(db.Model):
         :param user: User to be checked.
         :returns: True or False.
         """
-        if self.privacy_policy == PrivacyPolicy.PUBLIC:
+        if getattr(user, 'is_superadmin', False):
+            return True
+        elif self.privacy_policy == PrivacyPolicy.PUBLIC:
             return True
         elif self.privacy_policy == PrivacyPolicy.MEMBERS:
             return self.is_member(user)
         elif self.privacy_policy == PrivacyPolicy.ADMINS:
             return self.is_admin(user)
+
+    def can_edit(self, user):
+        """Determine if user can edit group data.
+
+        :param user: User to be checked.
+        :returns: True or False.
+        """
+        if getattr(user, 'is_superadmin', False):
+            return True
+        elif self.is_managed:
+            return False
+        else:
+            return self.is_admin(user)
+
+    def can_invite_others(self, user):
+        """Determine if user can invite people to a group.
+
+        Be aware that this check is independent from the people (users) which
+        are going to be invited. The checked user is the one who invites
+        someone, NOT who is going to be invited.
+
+        :param user: User to be checked.
+        :returns: True or False.
+        """
+        if getattr(user, 'is_superadmin', False):
+            return True
+        elif self.is_managed:
+            return False
+        elif self.is_admin(user):
+            return True
+        elif self.subscription_policy != SubscriptionPolicy.CLOSED:
+            return True
+        else:
+            return False
+
+    def can_leave(self, user):
+        """Determine if user can leave a group.
+
+        :param user: User to be checked.
+        :returns: True or False.
+        """
+        if getattr(user, 'is_superadmin', False):
+            return True
+        elif self.is_managed:
+            return False
+        else:
+            return self.is_member(user)
 
     def members_count(self):
         """Determine members count.
@@ -573,8 +622,12 @@ class Membership(db.Model):
     def query_requests(cls, admin, eager=False):
         """Get all pending group requests."""
         # Get direct pending request
-        q1 = GroupAdmin.query_by_admin(admin).with_entities(
-            GroupAdmin.group_id)
+        if hasattr(admin, 'is_superadmin') and admin.is_superadmin:
+            q1 = GroupAdmin.query.with_entities(
+                GroupAdmin.group_id)
+        else:
+            q1 = GroupAdmin.query_by_admin(admin).with_entities(
+                GroupAdmin.group_id)
         q2 = Membership.query.filter(
             Membership.state == MembershipState.PENDING_ADMIN,
             Membership.id_group.in_(q1),

@@ -78,7 +78,10 @@ def get_group_name(id_group):
 })
 def index(page, per_page, q):
     """List all user memberships."""
-    groups = Group.query_by_user(current_user, eager=True)
+    if current_user.is_superadmin:
+        groups = Group.query
+    else:
+        groups = Group.query_by_user(current_user, eager=True)
     if q:
         groups = Group.search(groups, q)
     groups = groups.paginate(page, per_page=per_page)
@@ -106,7 +109,7 @@ def index(page, per_page, q):
     'per_page': (int, 5),
 })
 def requests(page, per_page):
-    """List all user pending memberships."""
+    """List all pending memberships, listed only for group admins."""
     memberships = Membership.query_requests(current_user, eager=True).all()
 
     return render_template(
@@ -173,20 +176,29 @@ def new():
 @permission_required('usegroups')
 def manage(group_id):
     """Manage your group."""
-    group = Group.query.get(group_id)
+    group = Group.query.get_or_404(group_id)
     form = GroupForm(request.form, obj=group)
 
     if form.validate_on_submit():
-        try:
-            group.update(**form.data)
-            flash(_('Group "%(name)s" was updated', name=group.name),
-                  'success')
-        except Exception as e:
-            flash(str(e), 'error')
-            return render_template(
-                "groups/new.html",
-                form=form,
-                group=group,
+        if group.can_edit(current_user):
+            try:
+                group.update(**form.data)
+                flash(_('Group "%(name)s" was updated', name=group.name),
+                      'success')
+            except Exception as e:
+                flash(str(e), 'error')
+                return render_template(
+                    "groups/new.html",
+                    form=form,
+                    group=group,
+                )
+        else:
+            flash(
+                _(
+                    'You cannot edit group %(group_name)s',
+                    group_name=group.name
+                ),
+                'error'
             )
 
     return render_template(
@@ -201,15 +213,26 @@ def manage(group_id):
 @permission_required('usegroups')
 def delete(group_id):
     """Delete group."""
-    group = Group.query.get(group_id)
-    try:
-        group.delete()
-    except Exception as e:
-        flash(str(e), "error")
+    group = Group.query.get_or_404(group_id)
+
+    if group.can_edit(current_user):
+        try:
+            group.delete()
+        except Exception as e:
+            flash(str(e), "error")
+            return redirect(url_for(".index"))
+
+        flash(_('Successfully removed group "%(group_name)s"',
+                group_name=group.name), 'success')
         return redirect(url_for(".index"))
 
-    flash(_('Successfully removed group "%(group_name)s"',
-            group_name=group.name), 'success')
+    flash(
+        _(
+            'You cannot delete the group %(group_name)s',
+            group_name=group.name
+        ),
+        'error'
+    )
     return redirect(url_for(".index"))
 
 
@@ -230,23 +253,33 @@ def delete(group_id):
 })
 def members(group_id, page, per_page, q, s):
     """List user group members."""
-    group = Group.query.get(group_id)
-    members = Membership.query_by_group(group_id, with_invitations=True)
-    if q:
-        members = Membership.search(members, q)
-    if s:
-        members = Membership.order(members, Membership.state, s)
-    members = members.paginate(page, per_page=per_page)
+    group = Group.query.get_or_404(group_id)
+    if group.can_see_members(current_user):
+        members = Membership.query_by_group(group_id, with_invitations=True)
+        if q:
+            members = Membership.search(members, q)
+        if s:
+            members = Membership.order(members, Membership.state, s)
+        members = members.paginate(page, per_page=per_page)
 
-    return render_template(
-        "groups/members.html",
-        group=group,
-        members=members,
-        page=page,
-        per_page=per_page,
-        q=q,
-        s=s,
+        return render_template(
+            "groups/members.html",
+            group=group,
+            members=members,
+            page=page,
+            per_page=per_page,
+            q=q,
+            s=s,
+        )
+
+    flash(
+        _(
+            'You are not allowed to see members of this group %(group_name)s.',
+            group_name=group.name
+        ),
+        'error'
     )
+    return redirect(url_for('.index'))
 
 
 @blueprint.route('/<int:group_id>/leave', methods=['POST'])
@@ -256,14 +289,29 @@ def leave(group_id):
     """Leave group."""
     group = Group.query.get_or_404(group_id)
 
-    try:
-        group.remove_member(current_user)
-    except Exception as e:
-        flash(str(e), "error")
+    if group.can_leave(current_user):
+        try:
+            group.remove_member(current_user)
+        except Exception as e:
+            flash(str(e), "error")
+            return redirect(url_for('.index'))
+
+        flash(
+            _(
+                'You have successfully left %(group_name)s group.',
+                group_name=group.name
+            ),
+            'success'
+        )
         return redirect(url_for('.index'))
 
-    flash(_('You have successfully left %(group_name)s group.',
-            group_name=group.name), 'success')
+    flash(
+        _(
+            'You cannot leave the group %(group_name)s',
+            group_name=group.name
+        ),
+        'error'
+    )
     return redirect(url_for('.index'))
 
 
@@ -273,18 +321,29 @@ def leave(group_id):
 @permission_required('usegroups')
 def approve(group_id, user_id):
     """Approve a user."""
-    membership = Membership.query.get((user_id, group_id))
+    membership = Membership.query.get_or_404((user_id, group_id))
+    group = membership.group
 
-    try:
-        membership.accept()
-    except Exception as e:
-        flash(str(e), 'error')
+    if group.can_edit(current_user):
+        try:
+            membership.accept()
+        except Exception as e:
+            flash(str(e), 'error')
+            return redirect(url_for('.requests', group_id=membership.group.id))
+
+        flash(_('%(user)s accepted to %(name)s group.',
+                user=membership.user.email,
+                name=membership.group.name), 'success')
         return redirect(url_for('.requests', group_id=membership.group.id))
 
-    flash(_('%(user)s accepted to %(name)s group.',
-            user=membership.user.email,
-            name=membership.group.name), 'success')
-    return redirect(url_for('.requests', group_id=membership.group.id))
+    flash(
+        _(
+            'You cannot approve memberships for the group %(group_name)s',
+            group_name=group.name
+        ),
+        'error'
+    )
+    return redirect(url_for('.index'))
 
 
 @blueprint.route('/<int:group_id>/members/<int:user_id>/remove',
@@ -296,15 +355,25 @@ def remove(group_id, user_id):
     group = Group.query.get_or_404(group_id)
     user = User.query.get_or_404(user_id)
 
-    try:
-        group.remove_member(user)
-    except Exception as e:
-        flash(str(e), "error")
+    if group.can_edit(current_user):
+        try:
+            group.remove_member(user)
+        except Exception as e:
+            flash(str(e), "error")
+            return redirect(urlparse(request.referrer).path)
+
+        flash(_('User %(user_email)s was removed from %(group_name)s group.',
+                user_email=user.email, group_name=group.name), 'success')
         return redirect(urlparse(request.referrer).path)
 
-    flash(_('User %(user_email)s was removed from %(group_name)s group.',
-            user_email=user.email, group_name=group.name), 'success')
-    return redirect(urlparse(request.referrer).path)
+    flash(
+        _(
+            'You cannot delete users the group %(group_name)s',
+            group_name=group.name
+        ),
+        'error'
+    )
+    return redirect(url_for('.index'))
 
 
 @blueprint.route('/<int:group_id>/members/accept',
@@ -313,7 +382,9 @@ def remove(group_id, user_id):
 @permission_required('usegroups')
 def accept(group_id):
     """Accpet pending invitation."""
-    membership = Membership.query.get((current_user.get_id(), group_id))
+    membership = Membership.query.get_or_404((current_user.get_id(), group_id))
+
+    # no permission check, because they are checked during Memberships creating
 
     try:
         membership.accept()
@@ -332,10 +403,12 @@ def accept(group_id):
 @login_required
 @permission_required('usegroups')
 def reject(group_id):
-    """Leave group."""
-    membership = Membership.query.get((current_user.get_id(), group_id))
+    """Reject invitation."""
+    membership = Membership.query.get_or_404((current_user.get_id(), group_id))
     user = membership.user
     group = membership.group
+
+    # no permission check, because they are checked during Memberships creating
 
     try:
         membership.reject()
@@ -354,18 +427,30 @@ def reject(group_id):
 @register_breadcrumb(blueprint, '.members.new', _('New'))
 @permission_required('usegroups')
 def new_member(group_id):
-    """Add new member."""
+    """Add (invite) new member."""
     group = Group.query.get_or_404(group_id)
-    form = NewMemberForm()
 
-    if form.validate_on_submit():
-        emails = filter(None, form.data['emails'].splitlines())
-        group.invite_by_emails(emails)
-        flash(_('Requests sent!'), 'success')
-        return redirect(url_for('.members', group_id=group.id))
+    if group.can_invite_others(current_user):
+        form = NewMemberForm()
 
-    return render_template(
-        "groups/new_member.html",
-        group=group,
-        form=form
+        if form.validate_on_submit():
+            emails = filter(None, form.data['emails'].splitlines())
+            group.invite_by_emails(emails)
+            flash(_('Requests sent!'), 'success')
+            return redirect(url_for('.members', group_id=group.id))
+
+        return render_template(
+            "groups/new_member.html",
+            group=group,
+            form=form
+        )
+
+    flash(
+        _(
+            'You cannot invite user or yourself (i.e. join) to the group '
+            '%(group_name)s',
+            group_name=group.name
+        ),
+        'error'
     )
+    return redirect(url_for('.index'))
