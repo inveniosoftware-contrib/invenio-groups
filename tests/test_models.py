@@ -37,10 +37,10 @@ class BaseTestCase(InvenioTestCase):
         from invenio_groups.models import Group, Membership, GroupAdmin
         from invenio_accounts.models import User
 
-        Group.query.delete()
         Membership.query.delete()
         GroupAdmin.query.delete()
-        User.query.delete()
+        Group.query.delete()
+        User.query.filter(User.id != 1).delete()
         db.session.commit()
 
     def tearDown(self):
