@@ -36,6 +36,7 @@ requirements = [
     'Flask-Registry>=0.2',
     'Flask>=0.10.1',
     'invenio-accounts>=0.1.2',
+    'invenio-base>=0.2.1',
     'mock>=1.0.1',
     'six>=1.7.2',
     'SQLAlchemy-Utils[encrypted]>=0.30.1',

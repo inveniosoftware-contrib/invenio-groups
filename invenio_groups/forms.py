@@ -21,7 +21,7 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-from invenio.base.i18n import _
+from invenio_base.i18n import _
 from invenio.utils.forms import InvenioBaseForm
 
 from sqlalchemy_utils.types.choice import ChoiceType
