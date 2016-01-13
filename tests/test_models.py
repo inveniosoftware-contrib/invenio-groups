@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,115 +20,80 @@
 
 """Test groups data models."""
 
-from __future__ import absolute_import, print_function, unicode_literals
+from __future__ import absolute_import, print_function
 
-from invenio.ext.sqlalchemy import db
-from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
-
+import pytest
+from invenio_db import db
+from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError, NoResultFound
 
 
-class BaseTestCase(InvenioTestCase):
-    """Base test case."""
+def test_subscription_policy_validate():
+    """Test policy validation."""
+    from invenio_groups.api import SubscriptionPolicy
 
-    def setUp(self):
-        """Clear tables."""
-        from invenio_groups.models import Group, Membership, GroupAdmin
-        from invenio_accounts.models import User
-
-        Membership.query.delete()
-        GroupAdmin.query.delete()
-        Group.query.delete()
-        User.query.filter(User.id != 1).delete()
-        db.session.commit()
-
-    def tearDown(self):
-        """Expunge session."""
-        db.session.expunge_all()
+    assert SubscriptionPolicy.validate(SubscriptionPolicy.OPEN)
+    assert SubscriptionPolicy.validate(SubscriptionPolicy.APPROVAL)
+    assert SubscriptionPolicy.validate(SubscriptionPolicy.CLOSED)
+    assert not SubscriptionPolicy.validate("INVALID")
 
 
-class SubscriptionPolicyTestCase(BaseTestCase):
-    """Test SubscriptionPolicy class."""
+def test_subscription_policy_describe():
+    """Test policy describe."""
+    from invenio_groups.api import SubscriptionPolicy
 
-    def test_validate(self):
-        """Test policy validation."""
-        from invenio_groups.models import SubscriptionPolicy
-
-        self.assertTrue(SubscriptionPolicy.validate(SubscriptionPolicy.OPEN))
-        self.assertTrue(SubscriptionPolicy.validate(
-            SubscriptionPolicy.APPROVAL))
-        self.assertTrue(SubscriptionPolicy.validate(SubscriptionPolicy.CLOSED))
-        self.assertFalse(SubscriptionPolicy.validate("INVALID"))
-
-    def test_describe(self):
-        """Test policy describe."""
-        from invenio_groups.models import SubscriptionPolicy
-
-        self.assertTrue(
-            SubscriptionPolicy.describe(SubscriptionPolicy.OPEN))
-        self.assertTrue(
-            SubscriptionPolicy.describe(SubscriptionPolicy.APPROVAL))
-        self.assertTrue(
-            SubscriptionPolicy.describe(SubscriptionPolicy.CLOSED))
-        self.assertIsNone(SubscriptionPolicy.describe("INVALID"))
+    assert SubscriptionPolicy.describe(SubscriptionPolicy.OPEN)
+    assert SubscriptionPolicy.describe(SubscriptionPolicy.APPROVAL)
+    assert SubscriptionPolicy.describe(SubscriptionPolicy.CLOSED)
+    assert SubscriptionPolicy.describe("INVALID") is None
 
 
-class PrivacyPolicyTestCase(BaseTestCase):
-    """Test PrivacyPolicy class."""
+def test_privacy_policy_validate():
+    """Test policy validation."""
+    from invenio_groups.api import PrivacyPolicy
 
-    def test_validate(self):
-        """Test policy validation."""
-        from invenio_groups.models import PrivacyPolicy
-
-        self.assertTrue(PrivacyPolicy.validate(PrivacyPolicy.PUBLIC))
-        self.assertTrue(PrivacyPolicy.validate(PrivacyPolicy.MEMBERS))
-        self.assertTrue(PrivacyPolicy.validate(PrivacyPolicy.ADMINS))
-        self.assertFalse(PrivacyPolicy.validate("INVALID"))
-
-    def test_describe(self):
-        """Test policy describe."""
-        from invenio_groups.models import PrivacyPolicy
-
-        self.assertTrue(PrivacyPolicy.describe(PrivacyPolicy.PUBLIC))
-        self.assertTrue(PrivacyPolicy.describe(PrivacyPolicy.MEMBERS))
-        self.assertTrue(PrivacyPolicy.describe(PrivacyPolicy.ADMINS))
-        self.assertIsNone(PrivacyPolicy.describe("INVALID"))
+    assert PrivacyPolicy.validate(PrivacyPolicy.PUBLIC)
+    assert PrivacyPolicy.validate(PrivacyPolicy.MEMBERS)
+    assert PrivacyPolicy.validate(PrivacyPolicy.ADMINS)
+    assert not PrivacyPolicy.validate("INVALID")
 
 
-class MembershipState(BaseTestCase):
-    """Test MembershipState class."""
+def test_privacy_policy_describe():
+    """Test policy describe."""
+    from invenio_groups.api import PrivacyPolicy
 
-    def test_validate(self):
-        """Test policy validation."""
-        from invenio_groups.models import MembershipState
-
-        self.assertTrue(MembershipState.validate(
-            MembershipState.PENDING_ADMIN))
-        self.assertTrue(MembershipState.validate(
-            MembershipState.PENDING_USER))
-        self.assertTrue(MembershipState.validate(MembershipState.ACTIVE))
-        self.assertFalse(MembershipState.validate("INVALID"))
+    assert PrivacyPolicy.describe(PrivacyPolicy.PUBLIC)
+    assert PrivacyPolicy.describe(PrivacyPolicy.MEMBERS)
+    assert PrivacyPolicy.describe(PrivacyPolicy.ADMINS)
+    assert PrivacyPolicy.describe("INVALID") is None
 
 
-class GroupTestCase(BaseTestCase):
-    """Test Group data model api."""
+def test_membership_state_validate():
+    """Test policy validation."""
+    from invenio_groups.api import MembershipState
+    assert MembershipState.validate(MembershipState.PENDING_ADMIN)
+    assert MembershipState.validate(MembershipState.PENDING_USER)
+    assert MembershipState.validate(MembershipState.ACTIVE)
+    assert not MembershipState.validate("INVALID")
 
-    def test_creation(self):
-        """Test creation of groups."""
+
+def test_group_creation(app):
+    """Test creation of groups."""
+    with app.app_context():
         from invenio_groups.models import Group, \
             GroupAdmin, Membership, SubscriptionPolicy, PrivacyPolicy
 
         g = Group.create(name="test")
-        self.assertEqual(g.name, 'test')
-        self.assertEqual(g.description, '')
-        self.assertEqual(g.subscription_policy, SubscriptionPolicy.CLOSED)
-        self.assertEqual(g.privacy_policy, PrivacyPolicy.ADMINS)
-        self.assertEqual(g.is_managed, False)
+        assert g.name == 'test'
+        assert g.description == ''
+        assert g.subscription_policy == SubscriptionPolicy.CLOSED
+        assert g.privacy_policy == PrivacyPolicy.ADMINS
+        assert not g.is_managed
         assert g.created
         assert g.modified
-        self.assertEqual(GroupAdmin.query.count(), 0)
-        self.assertEqual(Membership.query.count(), 0)
+        assert GroupAdmin.query.count() == 0
+        assert Membership.query.count() == 0
 
         g2 = Group.create(
             name="admintest",
@@ -138,66 +103,71 @@ class GroupTestCase(BaseTestCase):
             is_managed=True,
             admins=[g]
         )
-        self.assertEqual(g2.name, 'admintest')
-        self.assertEqual(g2.description, 'desc')
-        self.assertEqual(g2.subscription_policy, SubscriptionPolicy.OPEN)
-        self.assertEqual(g2.privacy_policy, PrivacyPolicy.PUBLIC)
-        self.assertEqual(g2.is_managed, True)
+        assert g2.name == 'admintest'
+        assert g2.description == 'desc'
+        assert g2.subscription_policy == SubscriptionPolicy.OPEN
+        assert g2.privacy_policy == PrivacyPolicy.PUBLIC
+        assert g2.is_managed
         assert g2.created
         assert g2.modified
-        self.assertEqual(GroupAdmin.query.count(), 1)
+        assert GroupAdmin.query.count() == 1
         admin = g2.admins[0]
-        self.assertEqual(admin.admin_type, 'Group')
-        self.assertEqual(admin.admin_id, g.id)
-        self.assertEqual(Membership.query.count(), 0)
+        assert admin.admin_type == 'Group'
+        assert admin.admin_id == g.id
+        assert Membership.query.count() == 0
 
-    def test_creation_existing_name(self):
-        """Test what happens if group with identical name is created."""
+
+def test_group_creation_existing_name(app):
+    """Test what happens if group with identical name is created."""
+    with app.app_context():
         from invenio_groups.models import Group
 
         g = Group.create(name="test", )
-        self.assertRaises(
-            IntegrityError,
-            Group.create, name="test", admins=[g])
+        with pytest.raises(IntegrityError):
+            Group.create(name="test", admins=[g])
 
-    def test_creation_signals(self):
-        """Test signals sent after creation."""
+
+def test_group_creation_signals(app):
+    """Test signals sent after creation."""
+    with app.app_context():
         from invenio_groups.models import Group
-        from invenio_groups.signals import group_created
 
         Group.called = False
 
-        def _receiver(sender=None, group=None):
+        @event.listens_for(Group, 'after_insert')
+        def _receiver(mapper, connection, target):
             Group.called = True
-            assert sender == Group
-            assert group.name == 'signaltest'
+            assert isinstance(target, Group)
+            assert target.name == 'signaltest'
 
-        with group_created.connected_to(_receiver):
-            Group.create(name="signaltest")
+        Group.create(name="signaltest")
         assert Group.called
 
         Group.called = False
-        with group_created.connected_to(_receiver):
-            self.assertRaises(IntegrityError, Group.create, name="signaltest")
+        with pytest.raises(IntegrityError):
+            Group.create(name="signaltest")
         assert not Group.called
 
-    def test_creation_invalid_data(self):
-        """Test what happens if group with invalid data is created."""
+        event.remove(Group, 'after_insert', _receiver)
+
+
+def test_group_creation_invalid_data(app):
+    """Test what happens if group with invalid data is created."""
+    with app.app_context():
         from invenio_groups.models import Group
 
-        self.assertRaises(
-            AssertionError,
-            Group.create, name="")
-        self.assertRaises(
-            AssertionError,
-            Group.create, name="test", privacy_policy='invalid')
-        self.assertRaises(
-            AssertionError,
-            Group.create, name="test", subscription_policy='invalid')
-        self.assertEqual(Group.query.count(), 0)
+        with pytest.raises(AssertionError):
+            Group.create(name="")
+        with pytest.raises(AssertionError):
+            Group.create(name="test", privacy_policy='invalid')
+        with pytest.raises(AssertionError):
+            Group.create(name="test", subscription_policy='invalid')
+        assert Group.query.count() == 0
 
-    def test_delete(self):
-        """Test deletion of a group."""
+
+def test_group_delete(app):
+    """Test deletion of a group."""
+    with app.app_context():
         from invenio_groups.models import Group, GroupAdmin, Membership
         from invenio_accounts.models import User
 
@@ -211,17 +181,19 @@ class GroupTestCase(BaseTestCase):
 
         # Group is admin of another group, which will be left without admins
         g1.delete()
-        self.assertEqual(Group.query.count(), 1)
-        self.assertEqual(GroupAdmin.query.count(), 0)
-        self.assertEqual(Membership.query.count(), 1)
+        assert Group.query.count() == 1
+        assert GroupAdmin.query.count() == 0
+        assert Membership.query.count() == 1
 
         g2.delete()
-        self.assertEqual(Group.query.count(), 0)
-        self.assertEqual(GroupAdmin.query.count(), 0)
-        self.assertEqual(Membership.query.count(), 0)
+        assert Group.query.count() == 0
+        assert GroupAdmin.query.count() == 0
+        assert Membership.query.count() == 0
 
-    def test_update(self):
-        """."""
+
+def test_group_update(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, SubscriptionPolicy, \
             PrivacyPolicy
 
@@ -235,37 +207,42 @@ class GroupTestCase(BaseTestCase):
             is_managed=True,
         )
 
-        self.assertEqual(g.name, 'test-change')
-        self.assertEqual(g.description, 'changed')
-        self.assertEqual(g.subscription_policy, SubscriptionPolicy.OPEN)
-        self.assertEqual(g.privacy_policy, PrivacyPolicy.MEMBERS)
-        self.assertTrue(g.is_managed)
-        self.assertIsNot(m, g.modified)
+        assert g.name == 'test-change'
+        assert g.description == 'changed'
+        assert g.subscription_policy == SubscriptionPolicy.OPEN
+        assert g.privacy_policy == PrivacyPolicy.MEMBERS
+        assert g.is_managed
+        assert m is not g.modified
         assert g.created
 
-    def test_update_duplicated_names(self):
-        """."""
+
+def test_group_update_duplicated_names(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group
 
         g = Group.create(name="test")
         Group.create(name="test-change")
-        self.assertEqual(Group.query.count(), 2)
-        self.assertRaises(
-            IntegrityError,
-            g.update, name="test-change")
+        assert Group.query.count() == 2
+        with pytest.raises(IntegrityError):
+            g.update(name="test-change")
 
-    def test_get_by_name(self):
-        """Test get by name."""
+
+def test_group_get_by_name(app):
+    """Test get by name."""
+    with app.app_context():
         from invenio_groups.models import Group
 
         Group.create(name="test1")
         Group.create(name="test2")
 
-        self.assertEqual(Group.get_by_name("test1").name, "test1")
-        self.assertIsNone(Group.get_by_name("invalid"),)
+        assert Group.get_by_name("test1").name == "test1"
+        assert Group.get_by_name("invalid") is None
 
-    def test_query_by_names(self):
-        """Test query by names."""
+
+def test_group_query_by_names(app):
+    """Test query by names."""
+    with app.app_context():
         from invenio_groups.models import Group
         from flask.ext.sqlalchemy import BaseQuery
 
@@ -273,19 +250,20 @@ class GroupTestCase(BaseTestCase):
         Group.create(name="test2")
         Group.create(name="test3")
 
-        self.assertRaises(
-            AssertionError,
-            Group.query_by_names, 'test1')
+        with pytest.raises(AssertionError):
+            Group.query_by_names('test1')
 
-        self.assertIsInstance(Group.query_by_names(['test']), BaseQuery)
-        self.assertEqual(Group.query_by_names(["invalid"]).count(), 0)
-        self.assertEqual(Group.query_by_names(["test1"]).count(), 1)
-        self.assertEqual(Group.query_by_names(["test2", "invalid"]).count(), 1)
-        self.assertEqual(Group.query_by_names(["test1", "test2"]).count(), 2)
-        self.assertEqual(Group.query_by_names([]).count(), 0)
+        assert isinstance(Group.query_by_names(['test']), BaseQuery)
+        assert Group.query_by_names(["invalid"]).count() == 0
+        assert Group.query_by_names(["test1"]).count() == 1
+        assert Group.query_by_names(["test2", "invalid"]).count() == 1
+        assert Group.query_by_names(["test1", "test2"]).count() == 2
+        assert Group.query_by_names([]).count() == 0
 
-    def test_query_by_user(self):
-        """."""
+
+def test_group_query_by_user(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, Membership, \
             GroupAdmin, MembershipState
         from invenio_accounts.models import User
@@ -304,20 +282,22 @@ class GroupTestCase(BaseTestCase):
         g1.add_member(u3, state=MembershipState.ACTIVE)
         g2.add_member(u2, state=MembershipState.ACTIVE)
 
-        self.assertEqual(Group.query.count(), 2)
-        self.assertEqual(GroupAdmin.query.count(), 2)
-        self.assertEqual(Membership.query.count(), 3)
-        self.assertEqual(Group.query_by_user(u1).count(), 2)
-        self.assertEqual(Group.query_by_user(u1, with_pending=True).count(), 2)
-        self.assertEqual(Group.query_by_user(u2).count(), 1)
-        self.assertEqual(Group.query_by_user(u2, with_pending=True).count(), 2)
-        self.assertEqual(Group.query_by_user(u3).count(), 1)
-        self.assertEqual(Group.query_by_user(u3, with_pending=True).count(), 1)
-        self.assertEqual(Group.query_by_user(
-            u3, with_pending=True, eager=[Group.members]).count(), 1)
+        assert Group.query.count() == 2
+        assert GroupAdmin.query.count() == 2
+        assert Membership.query.count() == 3
+        assert Group.query_by_user(u1).count() == 2
+        assert Group.query_by_user(u1, with_pending=True).count() == 2
+        assert Group.query_by_user(u2).count() == 1
+        assert Group.query_by_user(u2, with_pending=True).count() == 2
+        assert Group.query_by_user(u3).count() == 1
+        assert Group.query_by_user(u3, with_pending=True).count() == 1
+        assert 1 == Group.query_by_user(
+            u3, with_pending=True, eager=[Group.members]).count()
 
-    def test_add_admin(self):
-        """."""
+
+def test_group_add_admin(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, GroupAdmin
 
         a = Group.create(name="admin")
@@ -325,30 +305,32 @@ class GroupTestCase(BaseTestCase):
 
         obj = g.add_admin(a)
 
-        self.assertIsInstance(obj, GroupAdmin)
-        self.assertEqual(GroupAdmin.query.count(), 1)
-        self.assertRaises(
-            IntegrityError,
-            g.add_admin, a)
+        assert isinstance(obj, GroupAdmin)
+        assert GroupAdmin.query.count() == 1
+        with pytest.raises(IntegrityError):
+            g.add_admin(a)
 
-    def test_remove_admin(self):
-        """."""
+
+def test_group_remove_admin(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, GroupAdmin
 
         a = Group.create(name="admin")
         g = Group.create(name="test", admins=[a])
 
-        self.assertEqual(GroupAdmin.query.count(), 1)
+        assert GroupAdmin.query.count() == 1
 
         g.remove_admin(a)
 
-        self.assertEqual(GroupAdmin.query.count(), 0)
-        self.assertRaises(
-            NoResultFound,
-            g.remove_admin, a)
+        assert GroupAdmin.query.count() == 0
+        with pytest.raises(NoResultFound):
+            g.remove_admin(a)
 
-    def test_add_member(self):
-        """."""
+
+def test_group_add_member(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, Membership
         from invenio_accounts.models import User
 
@@ -359,15 +341,16 @@ class GroupTestCase(BaseTestCase):
 
         obj = g.add_member(u)
 
-        self.assertIsInstance(obj, Membership)
-        self.assertEqual(Group.query.count(), 1)
-        self.assertEqual(Membership.query.count(), 1)
-        self.assertRaises(
-            FlushError,
-            g.add_member, u)
+        assert isinstance(obj, Membership)
+        assert Group.query.count() == 1
+        assert Membership.query.count() == 1
+        with pytest.raises(FlushError):
+            g.add_member(u)
 
-    def test_remove_member(self):
-        """."""
+
+def test_group_remove_member(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, Membership
         from invenio_accounts.models import User
 
@@ -378,39 +361,43 @@ class GroupTestCase(BaseTestCase):
 
         g.add_member(u)
 
-        self.assertEqual(Membership.query.count(), 1)
+        assert Membership.query.count() == 1
 
         g.remove_member(u)
 
-        self.assertEqual(Membership.query.count(), 0)
-        self.assertIsNone(g.remove_member(u))
+        assert Membership.query.count() == 0
+        assert g.remove_member(u) is None
 
-    def test_invite(self):
-        """."""
+
+def test_group_invite(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, Membership, \
             MembershipState
         from invenio_accounts.models import User
 
         g = Group.create(name="test")
-        u = User(email="test", password="test")
-        u2 = User(email="test", password="test")
+        u = User(email="test@inveniosoftware.org", password="123456")
+        u2 = User(email="test2@inveniosoftware.org", password="123456")
         db.session.add(u)
         db.session.add(u2)
         db.session.commit()
 
         m = g.invite(u)
-        self.assertEqual(Membership.query.count(), 1)
-        self.assertEqual(m.state, MembershipState.PENDING_USER)
+        assert Membership.query.count() == 1
+        assert m.state == MembershipState.PENDING_USER
 
         a = Group.create(name="admin")
         g2 = Group.create(name="test2", admins=[a])
-        self.assertIsNone(g2.invite(u2, admin=g))
+        assert g2.invite(u2, admin=g) is None
         m = g2.invite(u2, admin=a)
-        self.assertEqual(Membership.query.count(), 2)
-        self.assertEqual(m.state, MembershipState.PENDING_USER)
+        assert Membership.query.count() == 2
+        assert m.state == MembershipState.PENDING_USER
 
-    def test_subscribe(self):
-        """."""
+
+def test_group_subscribe(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, SubscriptionPolicy, \
             Membership, MembershipState
         from invenio_accounts.models import User
@@ -429,13 +416,15 @@ class GroupTestCase(BaseTestCase):
         m_c = g_c.subscribe(u)
         m_a = g_a.subscribe(u)
 
-        self.assertIsNone(m_c,)
-        self.assertEqual(m_a.state, MembershipState.PENDING_ADMIN)
-        self.assertEqual(m_o.state, MembershipState.ACTIVE)
-        self.assertEqual(Membership.query.count(), 2)
+        assert m_c is None
+        assert m_a.state == MembershipState.PENDING_ADMIN
+        assert m_o.state == MembershipState.ACTIVE
+        assert Membership.query.count() == 2
 
-    def test_is_admin(self):
-        """."""
+
+def test_group_is_admin(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group
         from invenio_accounts.models import User
 
@@ -446,14 +435,16 @@ class GroupTestCase(BaseTestCase):
 
         g.add_admin(u)
 
-        self.assertTrue(g.is_admin(u))
+        assert g.is_admin(u)
 
         a = Group.create(name="admin")
         g = Group.create(name="test2", admins=[a])
-        self.assertTrue(g.is_admin(a))
+        assert g.is_admin(a)
 
-    def test_is_member(self):
-        """."""
+
+def test_group_is_member(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group
         from invenio_accounts.models import User
 
@@ -464,14 +455,12 @@ class GroupTestCase(BaseTestCase):
 
         g.add_member(u)
 
-        self.assertTrue(g.is_member(u))
+        assert g.is_member(u)
 
 
-class MembershipTestCase(BaseTestCase):
-    """Test of membership data model."""
-
-    def test_create(self):
-        """."""
+def test_membership_create(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, Membership, \
             MembershipState
         from invenio_accounts.models import User
@@ -482,15 +471,16 @@ class MembershipTestCase(BaseTestCase):
         db.session.commit()
 
         m = Membership.create(g, u)
-        self.assertEqual(m.state, MembershipState.ACTIVE)
-        self.assertEqual(m.group.name, g.name)
-        self.assertEqual(m.user.id, u.id)
-        self.assertRaises(
-            FlushError,
-            Membership.create, g, u)
+        assert m.state == MembershipState.ACTIVE
+        assert m.group.name == g.name
+        assert m.user.id == u.id
+        with pytest.raises(FlushError):
+            Membership.create(g, u)
 
-    def test_delete(self):
-        """."""
+
+def test_membership_delete(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, Membership
         from invenio_accounts.models import User
 
@@ -500,13 +490,15 @@ class MembershipTestCase(BaseTestCase):
         db.session.commit()
 
         Membership.create(g, u)
-        self.assertEqual(Membership.query.count(), 1)
+        assert Membership.query.count() == 1
         Membership.delete(g, u)
-        self.assertEqual(Membership.query.count(), 0)
-        self.assertIsNone(Membership.delete(g, u))
+        assert Membership.query.count() == 0
+        assert Membership.delete(g, u) is None
 
-    def test_get(self):
-        """."""
+
+def test_membership_get(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, Membership
         from invenio_accounts.models import User
 
@@ -521,12 +513,14 @@ class MembershipTestCase(BaseTestCase):
         m = Membership.get(g, u)
         m2 = Membership.get(g, u2)
 
-        self.assertEqual(m.group.id, g.id)
-        self.assertEqual(m.user.id, u.id)
-        self.assertIsNone(m2)
+        assert m.group.id == g.id
+        assert m.user.id == u.id
+        assert m2 is None
 
-    def test_query_by_user(self):
-        """."""
+
+def test_membership_query_by_user(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, Membership, \
             MembershipState
         from invenio_accounts.models import User
@@ -541,12 +535,14 @@ class MembershipTestCase(BaseTestCase):
 
         Membership.create(g, u, MembershipState.ACTIVE)
 
-        self.assertIsInstance(Membership.query_by_user(u), BaseQuery)
-        self.assertEqual(Membership.query_by_user(u).count(), 1)
-        self.assertEqual(Membership.query_by_user(u2).count(), 0)
+        assert isinstance(Membership.query_by_user(u), BaseQuery)
+        assert Membership.query_by_user(u).count() == 1
+        assert Membership.query_by_user(u2).count() == 0
 
-    def test_query_invitations(self):
-        """."""
+
+def test_membership_query_invitations(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, Membership, \
             MembershipState
         from invenio_accounts.models import User
@@ -562,13 +558,15 @@ class MembershipTestCase(BaseTestCase):
         Membership.create(g, u2, MembershipState.PENDING_USER)
         Membership.create(g, u3, MembershipState.PENDING_ADMIN)
 
-        self.assertIsInstance(Membership.query_by_user(u1), BaseQuery)
-        self.assertEqual(Membership.query_invitations(u1).count(), 0)
-        self.assertEqual(Membership.query_invitations(u2).count(), 1)
-        self.assertEqual(Membership.query_invitations(u3).count(), 0)
+        assert isinstance(Membership.query_by_user(u1), BaseQuery)
+        assert Membership.query_invitations(u1).count() == 0
+        assert Membership.query_invitations(u2).count() == 1
+        assert Membership.query_invitations(u3).count() == 0
 
-    def test_query_requests(self):
-        """."""
+
+def test_membership_query_requests(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, Membership, \
             MembershipState
         from invenio_accounts.models import User
@@ -583,8 +581,8 @@ class MembershipTestCase(BaseTestCase):
         Membership.create(g, u1, MembershipState.PENDING_ADMIN)
         Membership.create(g, u2, MembershipState.PENDING_USER)
 
-        self.assertIsInstance(Membership.query_requests(u1), BaseQuery)
-        self.assertEqual(Membership.query_requests(a).count(), 1)
+        assert isinstance(Membership.query_requests(u1), BaseQuery)
+        assert Membership.query_requests(a).count() == 1
 
         ad = Group.create(name="admin")
         g2 = Group.create(name="test2", admins=[ad])
@@ -597,10 +595,12 @@ class MembershipTestCase(BaseTestCase):
         Membership.create(g2, u4, MembershipState.PENDING_ADMIN)
         Membership.create(g2, u5, MembershipState.PENDING_USER)
 
-        self.assertEqual(Membership.query_requests(u3).count(), 1)
+        assert Membership.query_requests(u3).count() == 1
 
-    def test_query_by_group(self):
-        """."""
+
+def test_membership_query_by_group(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, Membership, \
             MembershipState
         from invenio_accounts.models import User
@@ -615,12 +615,14 @@ class MembershipTestCase(BaseTestCase):
 
         Membership.create(g, u, MembershipState.ACTIVE)
 
-        self.assertIsInstance(Membership.query_by_group(g), BaseQuery)
-        self.assertEqual(Membership.query_by_group(g).count(), 1)
-        self.assertEqual(Membership.query_by_group(u2).count(), 0)
+        assert isinstance(Membership.query_by_group(g), BaseQuery)
+        assert 1 == Membership.query_by_group(g).count()
+        assert 0 == Membership.query_by_user(u2).count()
 
-    def test_accept(self):
-        """."""
+
+def test_membership_accept(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, Membership, \
             MembershipState
         from invenio_accounts.models import User
@@ -633,10 +635,12 @@ class MembershipTestCase(BaseTestCase):
         m = Membership.create(g, u, MembershipState.PENDING_ADMIN)
         m.accept()
 
-        self.assertEqual(m.state, MembershipState.ACTIVE)
+        assert m.state == MembershipState.ACTIVE
 
-    def test_reject(self):
-        """."""
+
+def test_membership_reject(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, Membership
         from invenio_accounts.models import User
 
@@ -648,43 +652,45 @@ class MembershipTestCase(BaseTestCase):
         m = Membership.create(g, u)
         m.reject()
 
-        self.assertEqual(Membership.query.count(), 0)
+        assert Membership.query.count() == 0
 
 
-class GroupAdminTestCase(BaseTestCase):
-    """Test of GroupAdmin data model."""
-
-    def test_create(self):
-        """."""
+def test_group_admin_create(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, GroupAdmin
         a = Group.create(name="admin")
         g = Group.create(name="test")
 
         ga = GroupAdmin.create(g, a)
 
-        self.assertEqual(ga.admin_type, 'Group')
-        self.assertEqual(ga.admin_id, a.id)
-        self.assertEqual(ga.group.id, g.id)
-        self.assertEqual(GroupAdmin.query.count(), 1)
+        assert ga.admin_type == 'Group'
+        assert ga.admin_id == a.id
+        assert ga.group.id == g.id
+        assert GroupAdmin.query.count() == 1
 
-    def test_delete(self):
-        """."""
+
+def test_group_admin_delete(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, GroupAdmin
         a = Group.create(name="admin")
         g = Group.create(name="test")
 
         ga = GroupAdmin.create(g, a)
 
-        self.assertEqual(ga.admin_type, 'Group')
-        self.assertEqual(ga.admin_id, a.id)
-        self.assertEqual(ga.group.id, g.id)
-        self.assertEqual(GroupAdmin.query.count(), 1)
+        assert ga.admin_type == 'Group'
+        assert ga.admin_id == a.id
+        assert ga.group.id == g.id
+        assert GroupAdmin.query.count() == 1
 
         GroupAdmin.delete(g, a)
-        self.assertEqual(GroupAdmin.query.count(), 0)
+        assert GroupAdmin.query.count() == 0
 
-    def test_query_by_group(self):
-        """."""
+
+def test_group_admin_query_by_group(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, GroupAdmin
         from flask.ext.sqlalchemy import BaseQuery
 
@@ -692,44 +698,36 @@ class GroupAdminTestCase(BaseTestCase):
         g = Group.create(name="test", admins=[a])
         g2 = Group.create(name="test2")
 
-        self.assertIsInstance(GroupAdmin.query_by_group(g), BaseQuery)
-        self.assertEqual(GroupAdmin.query_by_group(g).count(), 1)
-        self.assertEqual(GroupAdmin.query_by_group(g2).count(), 0)
+        assert isinstance(GroupAdmin.query_by_group(g), BaseQuery)
+        assert GroupAdmin.query_by_group(g).count() == 1
+        assert GroupAdmin.query_by_group(g2).count() == 0
 
-    def test_query_by_admin(self):
-        """."""
+
+def test_group_admin_query_by_admin(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, GroupAdmin
         from flask.ext.sqlalchemy import BaseQuery
 
         a = Group.create(name="admin")
         g = Group.create(name="test", admins=[a])
 
-        self.assertIsInstance(GroupAdmin.query_by_admin(a), BaseQuery)
-        self.assertEqual(GroupAdmin.query_by_admin(a).count(), 1)
-        self.assertEqual(GroupAdmin.query_by_admin(g).count(), 0)
+        assert isinstance(GroupAdmin.query_by_admin(a), BaseQuery)
+        assert GroupAdmin.query_by_admin(a).count() == 1
+        assert GroupAdmin.query_by_admin(g).count() == 0
 
-    def test_query_admins_by_group_ids(self):
-        """."""
+
+def test_group_admin_query_admins_by_group_ids(app):
+    """."""
+    with app.app_context():
         from invenio_groups.models import Group, GroupAdmin
         from sqlalchemy.orm.query import Query
 
         a = Group.create(name="admin")
         g = Group.create(name="test", admins=[a])
 
-        self.assertIsInstance(GroupAdmin.query_admins_by_group_ids([g.id]),
-                              Query)
-        self.assertEqual(
-            GroupAdmin.query_admins_by_group_ids([g.id]).count(), 1)
-        self.assertEqual(
-            GroupAdmin.query_admins_by_group_ids([a.id]).count(), 0)
-        self.assertRaises(
-            AssertionError,
-            GroupAdmin.query_admins_by_group_ids, 'invalid')
-
-
-TEST_SUITE = make_test_suite(
-    SubscriptionPolicyTestCase, PrivacyPolicyTestCase, GroupTestCase,
-    MembershipTestCase)
-
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE)
+        assert isinstance(GroupAdmin.query_admins_by_group_ids([g.id]), Query)
+        assert 1 == GroupAdmin.query_admins_by_group_ids([g.id]).count()
+        assert 0 == GroupAdmin.query_admins_by_group_ids([a.id]).count()
+        with pytest.raises(AssertionError):
+            GroupAdmin.query_admins_by_group_ids('invalid')

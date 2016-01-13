@@ -22,5 +22,30 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-[pytest]
-addopts = --pep8 --ignore=docs --cov=invenio_groups --cov-report=term-missing
+"""Invenio module that adds support for user groups."""
+
+from __future__ import absolute_import, print_function
+
+from .views import blueprint
+
+
+class InvenioGroups(object):
+    """Invenio-Groups extension."""
+
+    def __init__(self, app=None):
+        """Extension initialization."""
+        if app:
+            self.init_app(app)
+
+    def init_app(self, app):
+        """Flask application initialization."""
+        self.init_config(app)
+        app.register_blueprint(blueprint)
+        app.extensions['invenio-groups'] = self
+
+    def init_config(self, app):
+        """Initialize configuration."""
+        app.config.setdefault(
+            "GROUPS_BASE_TEMPLATE",
+            app.config.get("BASE_TEMPLATE",
+                           "invenio_groups/base.html"))

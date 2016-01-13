@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,13 +16,10 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
+{%- extends "invenio_groups/settings/base.html" %}
 
-{%- import "accounts/settings/helpers.html" as helpers with context %}
-{%- from "_formhelpers.html" import render_field with context %}
-
-{%- extends "accounts/settings/index_base.html" %}
-
-{%- bundles "groups.js", "groups.css" %}
+{%- import "invenio_groups/settings/helpers.html" as helpers with context -%}
+{%- from "invenio_groups/_macros.html" import render_field with context %}
 
 {%- block settings_body %}
 {%- set header = (group.name + " <small class='text-muted'>New member</small>") -%}
@@ -33,8 +30,7 @@
    ) }}
 <div class="panel-body">
   {%- block description %}
-  Specifies email addresses of the users you would like to add to your group.
-  Each user will be sent invitation.
+  {{ _('Specifies email addresses of the users you would like to add to your group. Each user will be sent invitation.') }}
   {%- endblock %}
 </div>
 <form id="new_member_form" role="form" method="POST" class="list-group-item">

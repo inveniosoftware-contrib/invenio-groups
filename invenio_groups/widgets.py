@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,11 +19,12 @@
 
 """Implement custom field widgets."""
 
-from __future__ import absolute_import, print_function, unicode_literals
+from __future__ import absolute_import, print_function
+
+from wtforms.widgets import HTMLString
 
 
 class RadioGroupWidget(object):
-
     """Render radio group with description."""
 
     def __init__(self, descriptions=None, **kwargs):
@@ -44,4 +45,4 @@ class RadioGroupWidget(object):
             html += ('<div class="radio"><label>%s %s '
                      '<small class="text-muted">%s</small>'
                      '</label></div>') % (subfield(), label, description)
-        return html
+        return HTMLString(html)

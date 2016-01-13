@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014, 2015 CERN.
+# Copyright (C) 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,21 +19,23 @@
 
 """Group bundles."""
 
-from __future__ import absolute_import, print_function, unicode_literals
+from __future__ import absolute_import, print_function
 
-from invenio_base.bundles import invenio as _i, jquery as _j
-from invenio.ext.assets import Bundle, RequireJSFilter
+from invenio_assets import Bundle, RequireJSFilter
+
+# FIXME from invenio_base.bundles import invenio as _i
+# FIXME from invenio_base.bundles import jquery as _j
 
 js = Bundle(
     'js/groups/init.js',
-    filters=RequireJSFilter(exclude=[_j, _i]),
+    filters=RequireJSFilter(),  # FIXME exclude=[_j, _i]),
     output="groups.js",
     weight=50
 )
 
 styles = Bundle(
-    "css/groups/groups.less",
-    filters="less,cleancss",
-    output="groups.css",
+    'css/groups/groups.less',
+    filters='less,cleancss',
+    output='groups.css',
     weight=50
 )

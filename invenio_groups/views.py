@@ -1,53 +1,49 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014, 2015 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015, 2016 CERN.
 #
-# Invenio is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as
+# Invenio is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
 # published by the Free Software Foundation; either version 2 of the
 # License, or (at your option) any later version.
 #
-# Invenio is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
+# Invenio is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Invenio; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# along with Invenio; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 """Groups Settings Blueprint."""
 
-from __future__ import absolute_import, print_function, unicode_literals
-
-from urlparse import urlparse
+from __future__ import absolute_import, print_function
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-
+from flask_babelex import gettext as _
 from flask_breadcrumbs import default_breadcrumb_root, register_breadcrumb
-
 from flask_login import current_user, login_required
-
 from flask_menu import register_menu
-
-from invenio_base.decorators import wash_arguments
-from invenio_base.i18n import _
-from invenio.ext.principal import permission_required
-
 from invenio_accounts.models import User
-
+from six.moves.urllib.parse import urlparse
 from sqlalchemy.exc import IntegrityError
 
-from ..forms import GroupForm, NewMemberForm
-from ..models import Group, Membership
-
+from .forms import GroupForm, NewMemberForm
+from .models import Group, Membership
 
 blueprint = Blueprint(
-    'groups_settings', __name__,
-    url_prefix="/account/settings/groups",
-    template_folder='../templates',
-    static_folder='../static',
+    'invenio_groups',
+    __name__,
+    template_folder='templates',
+    static_folder='static',
+    url_prefix='/accounts/settings/groups',
 )
 
 default_breadcrumb_root(blueprint, '.settings.groups')
@@ -70,18 +66,13 @@ def get_group_name(id_group):
 )
 @register_breadcrumb(blueprint, '.', _('Groups'))
 @login_required
-@permission_required('usegroups')
-@wash_arguments({
-    'page': (int, 1),
-    'per_page': (int, 5),
-    'q': (unicode, ''),
-})
-def index(page, per_page, q):
+def index():
     """List all user memberships."""
-    if current_user.is_superadmin:
-        groups = Group.query
-    else:
-        groups = Group.query_by_user(current_user, eager=True)
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 5, type=int)
+    q = request.args.get('q', '')
+
+    groups = Group.query_by_user(current_user, eager=True)
     if q:
         groups = Group.search(groups, q)
     groups = groups.paginate(page, per_page=per_page)
@@ -90,7 +81,7 @@ def index(page, per_page, q):
     invitations = Membership.query_invitations(current_user).count()
 
     return render_template(
-        'groups/settings.html',
+        'invenio_groups/index.html',
         groups=groups,
         requests=requests,
         invitations=invitations,
@@ -103,17 +94,14 @@ def index(page, per_page, q):
 @blueprint.route('/requests', methods=['GET'])
 @register_breadcrumb(blueprint, '.requests', _('Requests'))
 @login_required
-@permission_required('usegroups')
-@wash_arguments({
-    'page': (int, 1),
-    'per_page': (int, 5),
-})
-def requests(page, per_page):
+def requests():
     """List all pending memberships, listed only for group admins."""
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 5, type=int)
     memberships = Membership.query_requests(current_user, eager=True).all()
 
     return render_template(
-        'groups/pending.html',
+        'invenio_groups/pending.html',
         memberships=memberships,
         requests=True,
         page=page,
@@ -124,17 +112,14 @@ def requests(page, per_page):
 @blueprint.route('/invitations', methods=['GET'])
 @register_breadcrumb(blueprint, '.Invitations', _('Invitations'))
 @login_required
-@permission_required('usegroups')
-@wash_arguments({
-    'page': (int, 1),
-    'per_page': (int, 5),
-})
-def invitations(page, per_page):
+def invitations():
     """List all user pending memberships."""
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 5, type=int)
     memberships = Membership.query_invitations(current_user, eager=True).all()
 
     return render_template(
-        'groups/pending.html',
+        'invenio_groups/pending.html',
         memberships=memberships,
         page=page,
         per_page=per_page,
@@ -144,7 +129,6 @@ def invitations(page, per_page):
 @blueprint.route('/new', methods=['GET', 'POST'])
 @register_breadcrumb(blueprint, '.new', _('New'))
 @login_required
-@permission_required('usegroups')
 def new():
     """Create new group."""
     form = GroupForm(request.form)
@@ -159,7 +143,7 @@ def new():
             flash(_('Group creation failure'), 'error')
 
     return render_template(
-        "groups/new.html",
+        "invenio_groups/new.html",
         form=form,
     )
 
@@ -173,7 +157,6 @@ def new():
          {'text': _('Manage')}]
 )
 @login_required
-@permission_required('usegroups')
 def manage(group_id):
     """Manage your group."""
     group = Group.query.get_or_404(group_id)
@@ -188,7 +171,7 @@ def manage(group_id):
             except Exception as e:
                 flash(str(e), 'error')
                 return render_template(
-                    "groups/new.html",
+                    "invenio_groups/new.html",
                     form=form,
                     group=group,
                 )
@@ -202,7 +185,7 @@ def manage(group_id):
             )
 
     return render_template(
-        "groups/new.html",
+        "invenio_groups/new.html",
         form=form,
         group=group,
     )
@@ -210,7 +193,6 @@ def manage(group_id):
 
 @blueprint.route('/<int:group_id>/delete', methods=['POST'])
 @login_required
-@permission_required('usegroups')
 def delete(group_id):
     """Delete group."""
     group = Group.query.get_or_404(group_id)
@@ -244,15 +226,13 @@ def delete(group_id):
         [{'text': get_group_name(request.view_args['group_id'])},
          {'text': _('Members')}]
 )
-@permission_required('usegroups')
-@wash_arguments({
-    'page': (int, 1),
-    'per_page': (int, 5),
-    'q': (unicode, ''),
-    's': (unicode, ''),
-})
-def members(group_id, page, per_page, q, s):
+def members(group_id):
     """List user group members."""
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 5, type=int)
+    q = request.args.get('q', '')
+    s = request.args.get('s', '')
+
     group = Group.query.get_or_404(group_id)
     if group.can_see_members(current_user):
         members = Membership.query_by_group(group_id, with_invitations=True)
@@ -263,7 +243,7 @@ def members(group_id, page, per_page, q, s):
         members = members.paginate(page, per_page=per_page)
 
         return render_template(
-            "groups/members.html",
+            "invenio_groups/members.html",
             group=group,
             members=members,
             page=page,
@@ -284,7 +264,6 @@ def members(group_id, page, per_page, q, s):
 
 @blueprint.route('/<int:group_id>/leave', methods=['POST'])
 @login_required
-@permission_required('usegroups')
 def leave(group_id):
     """Leave group."""
     group = Group.query.get_or_404(group_id)
@@ -318,7 +297,6 @@ def leave(group_id):
 @blueprint.route('/<int:group_id>/members/<int:user_id>/approve',
                  methods=['POST'])
 @login_required
-@permission_required('usegroups')
 def approve(group_id, user_id):
     """Approve a user."""
     membership = Membership.query.get_or_404((user_id, group_id))
@@ -349,7 +327,6 @@ def approve(group_id, user_id):
 @blueprint.route('/<int:group_id>/members/<int:user_id>/remove',
                  methods=['POST'])
 @login_required
-@permission_required('usegroups')
 def remove(group_id, user_id):
     """Remove user from a group."""
     group = Group.query.get_or_404(group_id)
@@ -379,7 +356,6 @@ def remove(group_id, user_id):
 @blueprint.route('/<int:group_id>/members/accept',
                  methods=['POST'])
 @login_required
-@permission_required('usegroups')
 def accept(group_id):
     """Accpet pending invitation."""
     membership = Membership.query.get_or_404((current_user.get_id(), group_id))
@@ -401,7 +377,6 @@ def accept(group_id):
 @blueprint.route('/<int:group_id>/members/reject',
                  methods=['POST'])
 @login_required
-@permission_required('usegroups')
 def reject(group_id):
     """Reject invitation."""
     membership = Membership.query.get_or_404((current_user.get_id(), group_id))
@@ -425,7 +400,6 @@ def reject(group_id):
 @blueprint.route('/<int:group_id>/members/new', methods=['GET', 'POST'])
 @login_required
 @register_breadcrumb(blueprint, '.members.new', _('New'))
-@permission_required('usegroups')
 def new_member(group_id):
     """Add (invite) new member."""
     group = Group.query.get_or_404(group_id)
@@ -440,7 +414,7 @@ def new_member(group_id):
             return redirect(url_for('.members', group_id=group.id))
 
         return render_template(
-            "groups/new_member.html",
+            "invenio_groups/new_member.html",
             group=group,
             form=form
         )

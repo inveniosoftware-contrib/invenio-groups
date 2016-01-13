@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,33 +19,26 @@
 
 """Groups data models."""
 
-from __future__ import absolute_import, print_function, unicode_literals
+from __future__ import absolute_import, print_function
 
 from datetime import datetime
 
-from flask_login import current_user
-
-from invenio_base.i18n import _
-from invenio.ext.login.legacy_user import UserInfo
-from invenio.ext.sqlalchemy import db
-
+from flask_babelex import gettext as _
+from flask_login import UserMixin, current_user
 from invenio_accounts.models import User
-
+from invenio_db import db
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.expression import asc, desc
-
 from sqlalchemy_utils import generic_relationship
 from sqlalchemy_utils.types.choice import ChoiceType
 
-from .signals import group_created, group_deleted
 from .widgets import RadioGroupWidget
 
 
 class SubscriptionPolicy(object):
-
     """Group subscription policies."""
 
     OPEN = 'O'
@@ -80,7 +73,6 @@ class SubscriptionPolicy(object):
 
 
 class PrivacyPolicy(object):
-
     """Group privacy policies."""
 
     PUBLIC = 'P'
@@ -115,7 +107,6 @@ class PrivacyPolicy(object):
 
 
 class MembershipState(object):
-
     """Membership state."""
 
     PENDING_ADMIN = 'A'
@@ -134,10 +125,9 @@ class MembershipState(object):
 
 
 class Group(db.Model):
-
     """Group data model."""
 
-    __tablename__ = 'group'
+    __tablename__ = 'groups'
 
     PRIVACY_POLICIES = [
         (PrivacyPolicy.PUBLIC, _('Public')),
@@ -153,14 +143,14 @@ class Group(db.Model):
     ]
     """Subscription policy choices."""
 
-    id = db.Column(db.Integer(15, unsigned=True), nullable=False,
+    id = db.Column(db.Integer, nullable=False,
                    primary_key=True, autoincrement=True)
     """Group identifier."""
 
     name = db.Column(
         db.String(255), nullable=False, unique=True, index=True,
         info=dict(
-            label=_("Name"),
+            label=_('Name'),
             description=_('Required. A name of a group.'),
         ))
     """Name of group."""
@@ -168,7 +158,7 @@ class Group(db.Model):
     description = db.Column(
         db.Text, nullable=True, default='',
         info=dict(
-            label=_("Description"),
+            label=_('Description'),
             description=_('Optional. A short description of the group.'
                           ' Default: Empty'),
         ))
@@ -216,9 +206,6 @@ class Group(db.Model):
                subscription_policy=None, is_managed=False, admins=None):
         """Create a new group.
 
-        If the group is successfully created, the ``group_created`` signal will
-        be sent.
-
         :param name: Name of group. Required and must be unique.
         :param description: Description of group. Default: ``''``
         :param privacy_policy: PrivacyPolicy
@@ -233,7 +220,7 @@ class Group(db.Model):
             SubscriptionPolicy.validate(subscription_policy)
         assert admins is None or isinstance(admins, list)
 
-        try:
+        with db.session.begin_nested():
             obj = cls(
                 name=name,
                 description=description,
@@ -248,32 +235,15 @@ class Group(db.Model):
                     group=obj, admin_id=a.get_id(),
                     admin_type=resolve_admin_type(a)))
 
-            db.session.commit()
-
-            group_created.send(cls, group=obj)
-
-            return obj
-        except IntegrityError:
-            db.session.rollback()
-            raise
+        return obj
 
     def delete(self):
-        """Delete a group and all associated memberships.
-
-        If the group is successfully deleted, the ``group_deleted`` signal will
-        be sent.
-        """
-        try:
+        """Delete a group and all associated memberships."""
+        with db.session.begin_nested():
             Membership.query_by_group(self).delete()
             GroupAdmin.query_by_group(self).delete()
             GroupAdmin.query_by_admin(self).delete()
             db.session.delete(self)
-            db.session.commit()
-
-            group_deleted.send(self.__class__, group=self)
-        except Exception:
-            db.session.rollback()
-            raise
 
     def update(self, name=None, description=None, privacy_policy=None,
                subscription_policy=None, is_managed=None):
@@ -285,24 +255,25 @@ class Group(db.Model):
         :param subscription_policy: SubscriptionPolicy
         :returns: Updated group
         """
-        if name is not None:
-            self.name = name
-        if description is not None:
-            self.description = description
-        if (
-            privacy_policy is not None and
-            PrivacyPolicy.validate(privacy_policy)
-        ):
-            self.privacy_policy = privacy_policy
-        if (
-            subscription_policy is not None and
-            SubscriptionPolicy.validate(subscription_policy)
-        ):
-            self.subscription_policy = subscription_policy
-        if is_managed is not None:
-            self.is_managed = is_managed
+        with db.session.begin_nested():
+            if name is not None:
+                self.name = name
+            if description is not None:
+                self.description = description
+            if (
+                privacy_policy is not None and
+                PrivacyPolicy.validate(privacy_policy)
+            ):
+                self.privacy_policy = privacy_policy
+            if (
+                subscription_policy is not None and
+                SubscriptionPolicy.validate(subscription_policy)
+            ):
+                self.subscription_policy = subscription_policy
+            if is_managed is not None:
+                self.is_managed = is_managed
 
-        db.session.commit()
+            db.session.merge(self)
 
         return self
 
@@ -360,7 +331,7 @@ class Group(db.Model):
         :param str q: Search string.
         :returs: Query object.
         """
-        return query.filter(Group.name.like("%"+q+"%"))
+        return query.filter(Group.name.like('%{0}%'.format(q)))
 
     def add_admin(self, admin):
         """Invite an admin to a group.
@@ -533,24 +504,23 @@ class Group(db.Model):
 
 
 class Membership(db.Model):
-
     """Represent a users membership of a group."""
 
     MEMBERSHIP_STATE = {
-        MembershipState.PENDING_ADMIN: _("Pending admin approval"),
-        MembershipState.PENDING_USER: _("Pending member approval"),
-        MembershipState.ACTIVE: _("Active"),
+        MembershipState.PENDING_ADMIN: _('Pending admin approval'),
+        MembershipState.PENDING_USER: _('Pending member approval'),
+        MembershipState.ACTIVE: _('Active'),
     }
     """Membership state choices."""
 
-    __tablename__ = 'groupMEMBER'
+    __tablename__ = 'groups_members'
 
-    id_user = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(User.id),
+    id_user = db.Column(db.Integer, db.ForeignKey(User.id),
                         nullable=False, primary_key=True)
     """User for membership."""
 
     id_group = db.Column(
-        db.Integer(15, unsigned=True), db.ForeignKey(Group.id), nullable=False,
+        db.Integer, db.ForeignKey(Group.id), nullable=False,
         primary_key=True)
     """Group for membership."""
 
@@ -574,7 +544,7 @@ class Membership(db.Model):
     """User relaionship."""
 
     group = db.relationship(Group, backref=db.backref(
-        'members', cascade="all, delete-orphan"))
+        'members', cascade='all, delete-orphan'))
     """Group relationship."""
 
     @classmethod
@@ -680,8 +650,8 @@ class Membership(db.Model):
         """
         query = query.join(User).filter(
             db.or_(
-                User.nickname.like("%"+q+"%"),
-                User.email.like("%"+q+"%")
+                User.nickname.like('%{0}%'.format(q)),
+                User.email.like('%{0}%'.format(q)),
             )
         )
         return query
@@ -694,52 +664,40 @@ class Membership(db.Model):
         :param str s: Orderinig: ``asc`` or ``desc``.
         :returs: Query object.
         """
-        if s == "asc":
+        if s == 'asc':
             query = query.order_by(asc(field))
-        elif s == "desc":
+        elif s == 'desc':
             query = query.order_by(desc(field))
         return query
 
     @classmethod
     def create(cls, group, user, state=MembershipState.ACTIVE):
         """Create a new membership."""
-        try:
+        with db.session.begin_nested():
             membership = cls(
                 id_user=user.get_id(),
                 id_group=group.id,
                 state=state,
             )
             db.session.add(membership)
-            db.session.commit()
-
-            return membership
-        except IntegrityError:
-            db.session.rollback()
-            raise
+        return membership
 
     @classmethod
     def delete(cls, group, user):
         """Delete membership."""
-        try:
+        with db.session.begin_nested():
             cls.query.filter_by(group=group, id_user=user.get_id()).delete()
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
 
     def accept(self):
         """Activate membership."""
-        self.state = MembershipState.ACTIVE
-        db.session.commit()
+        with db.session.begin_nested():
+            self.state = MembershipState.ACTIVE
+            db.session.merge(self)
 
     def reject(self):
         """Remove membership."""
-        try:
+        with db.session.begin_nested():
             db.session.delete(self)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
 
     def is_active(self):
         """Check if membership is in an active state."""
@@ -750,23 +708,19 @@ class Membership(db.Model):
 # rewritten to allow efficient list queries (i.e. list me all groups i have
 # permissions to)
 class GroupAdmin(db.Model):
-
     """Represent an administrator of a group."""
 
-    __tablename__ = 'groupADMIN'
+    __tablename__ = 'groups_admin'
 
     __table_args__ = (
         db.UniqueConstraint('group_id', 'admin_type', 'admin_id'),
-        db.Model.__table_args__
+        getattr(db.Model, '__table_args__', {})
     )
 
-    id = db.Column(db.Integer(15, unsigned=True), nullable=False,
-                   primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     """GroupAdmin identifier."""
 
-    group_id = db.Column(
-        db.Integer(15, unsigned=True), db.ForeignKey(Group.id), nullable=False,
-        primary_key=True)
+    group_id = db.Column(db.Integer, db.ForeignKey(Group.id), nullable=False)
     """Group for membership."""
 
     admin_type = db.Column(db.Unicode(255))
@@ -780,7 +734,7 @@ class GroupAdmin(db.Model):
     #
 
     group = db.relationship(Group, backref=db.backref(
-        'admins', cascade="all, delete-orphan"))
+        'admins', cascade='all, delete-orphan'))
     """Group relationship."""
 
     admin = generic_relationship(admin_type, admin_id)
@@ -795,18 +749,13 @@ class GroupAdmin(db.Model):
         :returns: Newly created GroupAdmin object.
         :raises: IntegrityError
         """
-        try:
+        with db.session.begin_nested():
             obj = cls(
                 group=group,
                 admin=admin,
             )
             db.session.add(obj)
-
-            db.session.commit()
-            return obj
-        except IntegrityError:
-            db.session.rollback()
-            raise
+        return obj
 
     @classmethod
     def get(cls, group, admin):
@@ -826,14 +775,10 @@ class GroupAdmin(db.Model):
         :param group: Group object.
         :param admin: Admin object.
         """
-        try:
+        with db.session.begin_nested():
             obj = cls.query.filter(
                 cls.admin == admin, cls.group == group).one()
             db.session.delete(obj)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
 
     @classmethod
     def query_by_group(cls, group):
@@ -872,7 +817,7 @@ class GroupAdmin(db.Model):
 
 def resolve_admin_type(admin):
     """Determine admin type."""
-    if admin is current_user or isinstance(admin, UserInfo):
-        return "User"
+    if admin is current_user or isinstance(admin, UserMixin):
+        return 'User'
     else:
         return admin.__class__.__name__

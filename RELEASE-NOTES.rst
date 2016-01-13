@@ -1,8 +1,8 @@
 =======================
- Invenio-Groups v0.1.3
+ Invenio-Groups v1.0.0
 =======================
 
-Invenio-Groups v0.1.3 was released on September 7, 2015.
+Invenio-Groups v1.0.0 was released on TBD, 2016.
 
 About
 -----
@@ -11,27 +11,20 @@ Invenio module that adds support for user groups.
 
 *This is an experimental developer preview release.*
 
-Improved features
------------------
+What's new
+----------
 
-- Adds space between icons and text within buttons. This follows the
-  bootstrap design guidelines and makes it more consistent with the
-  rest of Invenio.
-
-Bug fixes
----------
-
-- Reintegrates permission checks after module rewrite. (#17) (#19)
+- Initial public release.
 
 Installation
 ------------
 
-   $ pip install invenio-groups==0.1.3
+   $ pip install invenio-groups==1.0.0
 
 Documentation
 -------------
 
-   http://invenio-groups.readthedocs.org/en/v0.1.3
+   http://pythonhosted.org/invenio-groups/
 
 Happy hacking and thanks for flying Invenio-Groups.
 

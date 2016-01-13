@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014, 2015 CERN.
+# Copyright (C) 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,10 +19,10 @@
 
 """Groups API."""
 
-from __future__ import absolute_import, print_function, unicode_literals
+from __future__ import absolute_import, print_function
 
-from .models import GroupAdmin, Groups, Membership, MembershipState, \
+from .models import Group, GroupAdmin, Membership, MembershipState, \
     PrivacyPolicy, SubscriptionPolicy
 
-__all__ = ('GroupAdmin', 'Groups', 'Membership', 'MembershipState',
+__all__ = ('GroupAdmin', 'Group', 'Membership', 'MembershipState',
            'PrivacyPolicy', 'SubscriptionPolicy')

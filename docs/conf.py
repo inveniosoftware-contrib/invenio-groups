@@ -1,36 +1,42 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN
+# Copyright (C) 2016 CERN.
 #
-# Invenio is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as
+# Invenio is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
 # published by the Free Software Foundation; either version 2 of the
 # License, or (at your option) any later version.
 #
-# Invenio is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
+# Invenio is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Invenio; if not, write to the Free Software Foundation,
-# Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# along with Invenio; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 from __future__ import print_function
 
-import sys
 import os
-import shlex
 
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath(os.path.join('..', 'invenio_groups')))
-sys.path.insert(0, os.path.abspath(os.path.join('_ext')))
+import sphinx.environment
+from docutils.utils import get_source_line
 
-import ultramock
-ultramock.activate()
+
+def _warn_node(self, msg, node):
+    """Do not warn on external images."""
+    if not msg.startswith('nonlocal image URI found:'):
+        self._warnfunc(msg, '{0}:{1}'.format(get_source_line(node)))
+
+sphinx.environment.BuildEnvironment.warn_node = _warn_node
+
 
 # -- General configuration ------------------------------------------------
 
@@ -42,7 +48,10 @@ ultramock.activate()
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.coverage',
+    'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.viewcode',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -60,15 +69,22 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Invenio Groups'
-copyright = u'2015, CERN'
+project = u'Invenio-Groups'
+copyright = u'2016, CERN'
 author = u'CERN'
 
-# Get the version string.  Cannot be done with import!
+# The version info for the project you're documenting, acts as replacement for
+# |version| and |release|, also used in various other places throughout the
+# built documents.
+#
+# The short X.Y version.
+
+# Get the version string. Cannot be done with import!
 g = {}
 with open(os.path.join('..', 'invenio_groups', 'version.py'), 'rt') as fp:
     exec(fp.read(), g)
     version = g['__version__']
+
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -118,17 +134,20 @@ todo_include_todos = False
 
 
 # -- Options for HTML output ----------------------------------------------
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+html_theme = 'alabaster'
 
-# only set the theme when we are not on RTD
-if not on_rtd:
-    try:
-        import sphinx_rtd_theme
-        html_theme = "sphinx_rtd_theme"
-        html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-    except ImportError:
-        print("`sphinx_rtd_theme` not found, pip install it", file=sys.stderr)
-        html_theme = 'alabaster'
+html_theme_options = {
+    'description': 'Invenio module that adds support for user groups.',
+    'github_user': 'inveniosoftware',
+    'github_repo': 'invenio-groups',
+    'github_button': False,
+    'github_banner': True,
+    'show_powered_by': False,
+    'extra_nav_links': {
+        'invenio-groups@GitHub': 'http://github.com/inveniosoftware/invenio-groups',
+        'invenio-groups@PyPI': 'http://pypi.python.org/pypi/invenio-groups/',
+    }
+}
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
@@ -160,7 +179,7 @@ if not on_rtd:
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+#html_static_path = ['_static']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -176,7 +195,15 @@ html_static_path = ['_static']
 #html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
-#html_sidebars = {}
+html_sidebars = {
+    '**': [
+        'about.html',
+        'navigation.html',
+        'relations.html',
+        'searchbox.html',
+        'donate.html',
+    ]
+}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
@@ -289,7 +316,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'invenio-groups', u'Invenio Groups Documentation',
+  (master_doc, 'invenio-groups', u'Invenio-Groups Documentation',
    author, 'invenio-groups', 'Invenio module that adds support for user groups.',
    'Miscellaneous'),
 ]

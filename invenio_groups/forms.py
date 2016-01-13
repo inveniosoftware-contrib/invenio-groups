@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014, 2015 CERN.
+# Copyright (C) 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,13 +19,11 @@
 
 """Group Forms."""
 
-from __future__ import absolute_import, print_function, unicode_literals
+from __future__ import absolute_import, print_function
 
-from invenio_base.i18n import _
-from invenio.utils.forms import InvenioBaseForm
-
+from flask_babelex import gettext as _
+from flask_wtf import Form
 from sqlalchemy_utils.types.choice import ChoiceType
-
 from wtforms import RadioField, TextAreaField
 from wtforms.validators import DataRequired, Email, StopValidation, \
     ValidationError
@@ -33,12 +31,10 @@ from wtforms_alchemy import ClassMap, model_form_factory
 
 from .models import Group
 
-
-ModelForm = model_form_factory(InvenioBaseForm)
+ModelForm = model_form_factory(Form)
 
 
 class EmailsValidator(object):
-
     """Validates TextAreaField containing emails.
 
     Runs DataRequired validator on whole field and additionaly for each email
@@ -67,7 +63,6 @@ class EmailsValidator(object):
 
 
 class GroupForm(ModelForm):
-
     """Form for creating and updating a group."""
 
     class Meta:
@@ -78,8 +73,7 @@ class GroupForm(ModelForm):
         ]
 
 
-class NewMemberForm(InvenioBaseForm):
-
+class NewMemberForm(Form):
     """For for adding new members to a group."""
 
     emails = TextAreaField(

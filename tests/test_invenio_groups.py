@@ -22,5 +22,38 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-[pytest]
-addopts = --pep8 --ignore=docs --cov=invenio_groups --cov-report=term-missing
+
+"""Module tests."""
+
+from __future__ import absolute_import, print_function
+
+from flask import Flask, url_for
+
+from invenio_groups import InvenioGroups
+
+
+def test_version():
+    """Test version import."""
+    from invenio_groups import __version__
+    assert __version__
+
+
+def test_init():
+    """Test extension initialization."""
+    app = Flask('testapp')
+    ext = InvenioGroups(app)
+    assert 'invenio-groups' in app.extensions
+
+    app = Flask('testapp')
+    ext = InvenioGroups()
+    assert 'invenio-groups' not in app.extensions
+    ext.init_app(app)
+    assert 'invenio-groups' in app.extensions
+
+
+def test_view(app):
+    """Test view."""
+    with app.app_context():
+        with app.test_client() as client:
+            res = client.get(url_for('invenio_groups.index'))
+            assert 200 != res.status_code

@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2012, 2014, 2015 CERN.
+# Copyright (C) 2012, 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,16 +16,13 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
+{%- extends "invenio_groups/settings/base.html" %}
 
-{%- import "accounts/settings/helpers.html" as helpers with context -%}
-{%- from "groups/helpers.html" import searchbar with context -%}
-{%- from "groups/helpers.html" import emptysearch with context -%}
-{%- from "paginate.html" import paginate with context -%}
-{%- from "paginate.html" import list_status with context -%}
-
-{%- extends "accounts/settings/index.html" -%}
-
-{%- bundles "groups.css" -%}
+{%- import "invenio_groups/settings/helpers.html" as helpers with context -%}
+{%- from "invenio_groups/helpers.html" import searchbar with context -%}
+{%- from "invenio_groups/helpers.html" import emptysearch with context -%}
+{%- from "invenio_groups/paginate.html" import paginate with context -%}
+{%- from "invenio_groups/paginate.html" import list_status with context -%}
 
 {%- block settings_body %}
 {{ helpers.panel_start(
