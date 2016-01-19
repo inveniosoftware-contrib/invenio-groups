@@ -611,10 +611,10 @@ def test_membership_query_by_group(app):
         u = User(email="test@test.test", password="test")
         u2 = User(email="test2@test2.test2", password="test2")
         db.session.add(u)
+        db.session.add(u2)
         db.session.commit()
 
         Membership.create(g, u, MembershipState.ACTIVE)
-
         assert isinstance(Membership.query_by_group(g), BaseQuery)
         assert 1 == Membership.query_by_group(g).count()
         assert 0 == Membership.query_by_user(u2).count()

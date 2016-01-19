@@ -56,7 +56,7 @@ def app(request):
         SECRET_KEY='changeme',
         SERVER_NAME='example.com',
         SQLALCHEMY_DATABASE_URI=os.environ.get(
-            'SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db'),
+            'SQLALCHEMY_DATABASE_URI', 'sqlite://'),
         TESTING=True,
         WTF_CSRF_ENABLED=False,
     )
@@ -69,13 +69,15 @@ def app(request):
     InvenioGroups(app)
 
     with app.app_context():
-        if not database_exists(str(db.engine.url)):
-            create_database(str(db.engine.url))
+        if str(db.engine.url) != 'sqlite://' and \
+           not database_exists(str(db.engine.url)):
+                create_database(str(db.engine.url))
         db.create_all()
 
     def teardown():
         with app.app_context():
-            drop_database(str(db.engine.url))
+            if str(db.engine.url) != 'sqlite://':
+                drop_database(str(db.engine.url))
         shutil.rmtree(instance_path)
 
     request.addfinalizer(teardown)

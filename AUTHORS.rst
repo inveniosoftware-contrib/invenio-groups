@@ -47,6 +47,7 @@ Contact us at `info@invenio-software.org
 - Leonardo Rossi <leonardo.r@cern.ch>
 - Marco Neumann <marco@crepererum.net>
 - Raquel Jimenez Encinar <raquel.jimenez.encinar@cern.ch>
+- Sami Hiltunen <sami.mikael.hiltunen@cern.ch>
 - Samuele Kaplun <samuele.kaplun@cern.ch>
 - Tibor Simko <tibor.simko@cern.ch>
 - Yoan Blanc <yoan.blanc@cern.ch>
