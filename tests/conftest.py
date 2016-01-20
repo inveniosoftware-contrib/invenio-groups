@@ -38,14 +38,16 @@ from flask_breadcrumbs import Breadcrumbs
 from flask_cli import FlaskCLI
 from flask_menu import Menu
 from invenio_accounts import InvenioAccounts
+from invenio_accounts.models import User
 from invenio_db import InvenioDB, db
 from sqlalchemy_utils.functions import create_database, database_exists, \
     drop_database
 
 from invenio_groups import InvenioGroups
+from invenio_groups.api import Group
 
 
-@pytest.fixture()
+@pytest.fixture
 def app(request):
     """Flask application fixture."""
     instance_path = tempfile.mkdtemp()
@@ -81,4 +83,32 @@ def app(request):
         shutil.rmtree(instance_path)
 
     request.addfinalizer(teardown)
+    return app
+
+
+@pytest.fixture
+def example_group(app):
+    """Create example groups."""
+    with app.app_context():
+        admin = User(email='test@example.com', password='test_password')
+        member = User(email='test2@example.com', password='test_password')
+        non_member = User(email='test3@example.com', password='test_password')
+        db.session.add(admin)
+        db.session.add(member)
+        db.session.add(non_member)
+        group = Group.create(name='test_group', admins=[admin])
+        membership = group.invite(member)
+        membership.accept()
+
+        admin_id = admin.id
+        member_id = member.id
+        non_member_id = non_member.id
+        group_id = group.id
+        db.session.commit()
+
+    app.get_admin = lambda: User.query.get(admin_id)
+    app.get_member = lambda: User.query.get(member_id)
+    app.get_non_member = lambda: User.query.get(non_member_id)
+    app.get_group = lambda: Group.query.get(group_id)
+
     return app

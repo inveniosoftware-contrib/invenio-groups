@@ -23,10 +23,14 @@
 from __future__ import absolute_import, print_function
 
 import pytest
+from invenio_accounts.models import User
 from invenio_db import db
 from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError, NoResultFound
+
+from invenio_groups.api import Group, Membership, MembershipState, \
+    PrivacyPolicy, SubscriptionPolicy
 
 
 def test_subscription_policy_validate():
@@ -448,14 +452,24 @@ def test_group_is_member(app):
         from invenio_groups.models import Group
         from invenio_accounts.models import User
 
-        g = Group.create(name="test")
-        u = User(email="test", password="test")
+        g = Group.create(name='test_group')
+        u = User(email='test@example.com', password='test_password')
+        u2 = User(email='test2@example.com', password='test_password')
+        u3 = User(email='test3@example.com', password='test_password')
         db.session.add(u)
+        db.session.add(u2)
+        db.session.add(u3)
         db.session.commit()
 
         g.add_member(u)
+        g.add_member(u2, state=MembershipState.PENDING_USER)
+        g.add_member(u3, state=MembershipState.PENDING_ADMIN)
 
         assert g.is_member(u)
+        assert not g.is_member(u2)
+        assert g.is_member(u2, with_pending=True)
+        assert not g.is_member(u3)
+        assert g.is_member(u3, with_pending=True)
 
 
 def test_membership_create(app):
@@ -636,6 +650,7 @@ def test_membership_accept(app):
         m.accept()
 
         assert m.state == MembershipState.ACTIVE
+        assert m.is_active()
 
 
 def test_membership_reject(app):
@@ -731,3 +746,169 @@ def test_group_admin_query_admins_by_group_ids(app):
         assert 0 == GroupAdmin.query_admins_by_group_ids([a.id]).count()
         with pytest.raises(AssertionError):
             GroupAdmin.query_admins_by_group_ids('invalid')
+
+
+def test_invite_by_emails(app):
+    """Test inviting users by email."""
+    with app.app_context():
+
+        u1 = User(email='test@example.com', password='test_password')
+        u2 = User(email='test2@example.com', password='test_password')
+        g = Group.create(name='test_group')
+
+        db.session.add(u1)
+        db.session.add(u2)
+        db.session.commit()
+
+        result = g.invite_by_emails(
+            [
+                u1.email,
+                u2.email,
+                'invalid@example.com'
+            ]
+        )
+
+        assert result[0].state is MembershipState.PENDING_USER
+        assert result[1].state is MembershipState.PENDING_USER
+        assert result[2] is None
+
+        assert g.is_member(u1, with_pending=True)
+        assert g.is_member(u2, with_pending=True)
+        assert not g.is_member('invalid@example.com', with_pending=True)
+
+
+def test_can_see_members(example_group):
+    """Test can_see_members."""
+    app = example_group
+    with app.app_context():
+        group = app.get_group()
+        admin = app.get_admin()
+        member = app.get_member()
+        non_member = app.get_non_member()
+
+        assert group.is_member(member)
+        assert group.is_admin(admin)
+        assert not group.is_member(non_member)
+
+        group.privacy_policy = PrivacyPolicy.ADMINS
+        assert group.can_see_members(admin)
+        assert not group.can_see_members(member)
+        assert not group.can_see_members(non_member)
+
+        group.privacy_policy = PrivacyPolicy.MEMBERS
+        assert group.can_see_members(admin)
+        assert group.can_see_members(member)
+        assert not group.can_see_members(non_member)
+
+        group.privacy_policy = PrivacyPolicy.PUBLIC
+        assert group.can_see_members(admin)
+        assert group.can_see_members(member)
+        assert group.can_see_members(non_member)
+
+
+def test_can_edit(example_group):
+    """Test can_edit function."""
+    app = example_group
+    with app.app_context():
+        group = app.get_group()
+        admin = app.get_admin()
+        member = app.get_member()
+        non_member = app.get_non_member()
+
+        assert group.can_edit(admin)
+        assert not group.can_edit(member)
+        assert not group.can_edit(non_member)
+
+        group.is_managed = True
+        assert not group.can_edit(admin)
+        assert not group.can_edit(member)
+        assert not group.can_edit(non_member)
+
+
+def test_can_invite_others(example_group):
+    """test can_edit_others function."""
+    app = example_group
+    with app.app_context():
+        group = app.get_group()
+        admin = app.get_admin()
+        member = app.get_member()
+        non_member = app.get_non_member()
+
+        group.subscription_policy = SubscriptionPolicy.OPEN
+        assert group.can_invite_others(admin)
+        assert group.can_invite_others(member)
+        assert group.can_invite_others(non_member)
+
+        group.subscription_policy = SubscriptionPolicy.APPROVAL
+        assert group.can_invite_others(admin)
+        assert group.can_invite_others(member)
+        assert group.can_invite_others(non_member)
+
+        group.subscription_policy = SubscriptionPolicy.CLOSED
+        assert group.can_invite_others(admin)
+        assert not group.can_invite_others(member)
+        assert not group.can_invite_others(non_member)
+
+        group.is_managed = True
+        assert not group.can_invite_others(admin)
+        assert not group.can_invite_others(member)
+        assert not group.can_invite_others(non_member)
+
+
+def test_can_leave(example_group):
+    """Test can_leave function."""
+    app = example_group
+    with app.app_context():
+        group = app.get_group()
+        admin = app.get_admin()
+        member = app.get_member()
+        non_member = app.get_non_member()
+
+        group.is_managed = False
+        assert not group.can_leave(admin)
+        assert group.can_leave(member)
+        assert not group.can_leave(non_member)
+
+        group.is_managed = True
+        assert not group.can_leave(admin)
+        assert not group.can_leave(member)
+        assert not group.can_leave(non_member)
+
+
+def test_members_count(example_group):
+    """Test members_count function."""
+    app = example_group
+    with app.app_context():
+        non_member = app.get_non_member()
+        group = app.get_group()
+
+        assert group.members_count() == 1
+        group.add_member(non_member)
+        assert group.members_count() == 2
+
+
+def test_group_search(example_group):
+    """Test group search function."""
+    app = example_group
+    with app.app_context():
+        group = app.get_group()
+        assert group == Group.search(Group.query, 'test_group').one()
+        assert group == Group.search(Group.query, '_group').one()
+        assert group == Group.search(Group.query, '_group').one()
+        assert group == Group.search(Group.query, 'st_gro').one()
+
+
+def test_membership_search(example_group):
+    """Test membership search function."""
+    app = example_group
+    with app.app_context():
+        member = app.get_member()
+
+        assert member.get_id() == str(Membership.search(
+            Membership.query, 'test2@example.com').one().id_user)
+        assert member.get_id() == str(Membership.search(
+            Membership.query, '@example.com').one().id_user)
+        assert member.get_id() == str(Membership.search(
+            Membership.query, 'test2@example').one().id_user)
+        assert member.get_id() == str(Membership.search(
+            Membership.query, '@example').one().id_user)

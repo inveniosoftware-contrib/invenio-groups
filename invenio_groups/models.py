@@ -23,6 +23,7 @@ from __future__ import absolute_import, print_function
 
 from datetime import datetime
 
+from flask import current_app
 from flask_babelex import gettext as _
 from flask_login import UserMixin, current_user
 from invenio_accounts.models import User
@@ -382,16 +383,20 @@ class Group(db.Model):
         """Invite users to a group by emails.
 
         :param list emails: Emails of users that shall be invited.
-        :returns: Newly created Membership or None.
+        :returns list: Newly created Memberships or Nones.
         """
         assert emails is None or isinstance(emails, list)
+
+        results = []
 
         for email in emails:
             try:
                 user = User.query.filter_by(email=email).one()
-                return self.invite(user)
-            except Exception:
-                return None
+                results.append(self.invite(user))
+            except NoResultFound:
+                results.append(None)
+
+        return results
 
     def subscribe(self, user):
         """Subscribe a user to a group (done by users).
@@ -439,12 +444,10 @@ class Group(db.Model):
         :param user: User to be checked.
         :returns: True or False.
         """
-        if getattr(user, 'is_superadmin', False):
-            return True
-        elif self.privacy_policy == PrivacyPolicy.PUBLIC:
+        if self.privacy_policy == PrivacyPolicy.PUBLIC:
             return True
         elif self.privacy_policy == PrivacyPolicy.MEMBERS:
-            return self.is_member(user)
+            return self.is_member(user) or self.is_admin(user)
         elif self.privacy_policy == PrivacyPolicy.ADMINS:
             return self.is_admin(user)
 
@@ -454,9 +457,7 @@ class Group(db.Model):
         :param user: User to be checked.
         :returns: True or False.
         """
-        if getattr(user, 'is_superadmin', False):
-            return True
-        elif self.is_managed:
+        if self.is_managed:
             return False
         else:
             return self.is_admin(user)
@@ -471,9 +472,7 @@ class Group(db.Model):
         :param user: User to be checked.
         :returns: True or False.
         """
-        if getattr(user, 'is_superadmin', False):
-            return True
-        elif self.is_managed:
+        if self.is_managed:
             return False
         elif self.is_admin(user):
             return True
@@ -488,9 +487,7 @@ class Group(db.Model):
         :param user: User to be checked.
         :returns: True or False.
         """
-        if getattr(user, 'is_superadmin', False):
-            return True
-        elif self.is_managed:
+        if self.is_managed:
             return False
         else:
             return self.is_member(user)
@@ -649,10 +646,7 @@ class Membership(db.Model):
         :returs: Query object.
         """
         query = query.join(User).filter(
-            db.or_(
-                User.nickname.like('%{0}%'.format(q)),
                 User.email.like('%{0}%'.format(q)),
-            )
         )
         return query
 
@@ -726,7 +720,7 @@ class GroupAdmin(db.Model):
     admin_type = db.Column(db.Unicode(255))
     """Generic relationship to an object."""
 
-    admin_id = db.Column(db.Integer)
+    admin_id = db.Column(db.Integer, nullable=False)
     """Generic relationship to an object."""
 
     #
