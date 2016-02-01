@@ -66,6 +66,8 @@ class GroupForm(ModelForm):
     """Form for creating and updating a group."""
 
     class Meta:
+        """Metadata class."""
+
         model = Group
         type_map = ClassMap({ChoiceType: RadioField})
         exclude = [
