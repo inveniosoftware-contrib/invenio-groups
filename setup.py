@@ -78,8 +78,8 @@ install_requires = [
     'Flask-WTF>=0.12',
     'invenio-accounts>=1.0.0a6',
     'invenio-assets>=1.0.0a3',
-    'WTForms>=2.0.2',
-    'WTForms-Alchemy>=0.13.3',
+    'WTForms>=2.1.0',
+    'WTForms-Alchemy>=0.15.0',
 ]
 
 packages = find_packages()
