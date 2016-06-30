@@ -88,12 +88,12 @@ def users():
         PrivacyPolicy, SubscriptionPolicy
 
     admin = accounts.datastore.create_user(
-        email='admin@invenio-software.org',
+        email='admin@inveniosoftware.org',
         password=encrypt_password('123456'),
         active=True,
     )
     reader = accounts.datastore.create_user(
-        email='reader@invenio-software.org',
+        email='reader@inveniosoftware.org',
         password=encrypt_password('123456'),
         active=True,
     )
