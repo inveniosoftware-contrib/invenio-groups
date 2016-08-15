@@ -309,7 +309,7 @@ class Group(db.Model):
         :param bool eager: Eagerly fetch group members.
         :returns: Query object.
         """
-        q1 = Group.query.join(Membership).filter_by(id_user=user.get_id())
+        q1 = Group.query.join(Membership).filter_by(user_id=user.get_id())
         if not with_pending:
             q1 = q1.filter_by(state=MembershipState.ACTIVE)
         if eager:
@@ -512,7 +512,7 @@ class Membership(db.Model):
 
     __tablename__ = 'groups_members'
 
-    id_user = db.Column(db.Integer, db.ForeignKey(User.id),
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id),
                         nullable=False, primary_key=True)
     """User for membership."""
 
@@ -553,7 +553,7 @@ class Membership(db.Model):
         :returns: Membership or None.
         """
         try:
-            m = cls.query.filter_by(id_user=user.get_id(), group=group).one()
+            m = cls.query.filter_by(user_id=user.get_id(), group=group).one()
             return m
         except Exception:
             return None
@@ -573,7 +573,7 @@ class Membership(db.Model):
     def query_by_user(cls, user, **kwargs):
         """Get a user's memberships."""
         return cls._filter(
-            cls.query.filter_by(id_user=user.get_id()),
+            cls.query.filter_by(user_id=user.get_id()),
             **kwargs
         )
 
@@ -669,7 +669,7 @@ class Membership(db.Model):
         """Create a new membership."""
         with db.session.begin_nested():
             membership = cls(
-                id_user=user.get_id(),
+                user_id=user.get_id(),
                 id_group=group.id,
                 state=state,
             )
@@ -680,7 +680,7 @@ class Membership(db.Model):
     def delete(cls, group, user):
         """Delete membership."""
         with db.session.begin_nested():
-            cls.query.filter_by(group=group, id_user=user.get_id()).delete()
+            cls.query.filter_by(group=group, user_id=user.get_id()).delete()
 
     def accept(self):
         """Activate membership."""

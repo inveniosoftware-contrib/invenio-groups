@@ -32,6 +32,7 @@ Contact us at `info@inveniosoftware.org
 <mailto:info@inveniosoftware.org>`_.
 
 - Adrian Pawel Baran <adrian.pawel.baran@cern.ch>
+- Alizee Pace <alizee.pace@gmail.com>
 - Benoit Thiell <bthiell@cfa.harvard.edu>
 - Charlotte Cattaneo <ciris.cattaneo@gmail.com>
 - Diane Berkovits <diane.berkovits@cern.ch>

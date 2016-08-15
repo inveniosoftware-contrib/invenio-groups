@@ -905,10 +905,10 @@ def test_membership_search(example_group):
         member = app.get_member()
 
         assert member.get_id() == str(Membership.search(
-            Membership.query, 'test2@example.com').one().id_user)
+            Membership.query, 'test2@example.com').one().user_id)
         assert member.get_id() == str(Membership.search(
-            Membership.query, '@example.com').one().id_user)
+            Membership.query, '@example.com').one().user_id)
         assert member.get_id() == str(Membership.search(
-            Membership.query, 'test2@example').one().id_user)
+            Membership.query, 'test2@example').one().user_id)
         assert member.get_id() == str(Membership.search(
-            Membership.query, '@example').one().id_user)
+            Membership.query, '@example').one().user_id)
