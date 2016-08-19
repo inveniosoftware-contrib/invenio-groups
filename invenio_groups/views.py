@@ -345,7 +345,7 @@ def remove(group_id, user_id):
 
     flash(
         _(
-            'You cannot delete users the group %(group_name)s',
+            'You cannot delete users of the group %(group_name)s',
             group_name=group.name
         ),
         'error'
@@ -421,7 +421,7 @@ def new_member(group_id):
 
     flash(
         _(
-            'You cannot invite user or yourself (i.e. join) to the group '
+            'You cannot invite users or yourself (i.e. join) to the group '
             '%(group_name)s',
             group_name=group.name
         ),

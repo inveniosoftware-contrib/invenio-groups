@@ -43,7 +43,7 @@
 [main]
 host = https://www.transifex.com
 
-[invenio-groups.messagespot]
+[invenio-1.invenio-groups-messages]
 file_filter = invenio_groups/translations/<lang>/LC_MESSAGES/messages.po
 source_file = invenio_groups/translations/messages.pot
 source_lang = en

@@ -1,226 +1,385 @@
-# Italian translations for invenio-groups.
-# Copyright (C) 2015 ORGANIZATION
+# Translations template for invenio-groups.
+# Copyright (C) 2016 CERN
 # This file is distributed under the same license as the invenio-groups
 # project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
-#
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
+# 
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: invenio-groups 0.1.2\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-08-25 18:50+0200\n"
-"PO-Revision-Date: 2015-08-04 19:58+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: it <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Project-Id-Version: invenio-groups 1.0.0.dev20160000\n"
+"Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
+"POT-Creation-Date: 2016-08-19 11:14+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Alizee Pace <alizee.pace@gmail.com>, 2016\n"
+"Language-Team: Italian (https://www.transifex.com/inveniosoftware/teams/23537/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.0\n"
+"Generated-By: Babel 2.3.4\n"
+"Language: it\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: invenio_groups/forms.py:86
+#: invenio_groups/forms.py:82
 msgid ""
-"Required. Provide list of the emails of the users you wish to be added. "
-"Put each email in new line."
+"Required. Provide list of the emails of the users you wish to be added. Put "
+"each email in new line."
 msgstr ""
+"Obbligatorio. Lista gli indirizzi email degli utenti che vorresti "
+"aggiungere. Metti ogni indirizzo su una nuova linea."
 
-#: invenio_groups/models.py:62
+#: invenio_groups/models.py:56
 msgid "Users can self-subscribe."
-msgstr ""
+msgstr "Gli utenti possono abbonarsi loro stessi."
 
-#: invenio_groups/models.py:64
+#: invenio_groups/models.py:58
 msgid "Users can self-subscribe but requires administrator approval."
 msgstr ""
+"Gli utenti possono abbonarsi loro stessi ma necessitano l'approvazione del "
+"amministratore."
 
-#: invenio_groups/models.py:66
+#: invenio_groups/models.py:60
 msgid "Subscription is by administrator invitation only."
-msgstr ""
+msgstr "L'abbonamento si fa solo su invito del amministratore."
 
-#: invenio_groups/models.py:97
+#: invenio_groups/models.py:90
 msgid "Group membership is fully public."
-msgstr ""
+msgstr "L'adesione al gruppo è pubblica."
 
-#: invenio_groups/models.py:99
+#: invenio_groups/models.py:92
 msgid "Only group members can view other members."
-msgstr ""
+msgstr "Solo i membri del gruppo possono vedere gli altri membri."
 
-#: invenio_groups/models.py:101
+#: invenio_groups/models.py:94
 msgid "Only administrators can view members."
-msgstr ""
+msgstr "Solo gli amministratori possono vedere i membri."
+
+#: invenio_groups/models.py:134
+msgid "Public"
+msgstr "Pubblico"
+
+#: invenio_groups/models.py:135
+msgid "Group members"
+msgstr "Membri del gruppo"
+
+#: invenio_groups/models.py:136
+msgid "Group admins"
+msgstr "Amministratori del gruppo"
+
+#: invenio_groups/models.py:141
+msgid "Open"
+msgstr "Aperto"
+
+#: invenio_groups/models.py:142
+msgid "Open with approval"
+msgstr "Aperto con approvazione"
 
 #: invenio_groups/models.py:143
-msgid "Public"
-msgstr ""
-
-#: invenio_groups/models.py:144
-msgid "Group members"
-msgstr ""
-
-#: invenio_groups/models.py:145
-msgid "Group admins"
-msgstr ""
-
-#: invenio_groups/models.py:150
-msgid "Open"
-msgstr ""
-
-#: invenio_groups/models.py:151
-msgid "Open with approval"
-msgstr ""
-
-#: invenio_groups/models.py:152
 msgid "Closed"
-msgstr ""
+msgstr "Chiuso"
+
+#: invenio_groups/models.py:154
+#: invenio_groups/templates/invenio_groups/index.html:63
+msgid "Name"
+msgstr "Nome"
+
+#: invenio_groups/models.py:155
+msgid "Required. A name of a group."
+msgstr "Obbligatorio. Un nome per il gruppo."
+
+#: invenio_groups/models.py:162
+msgid "Description"
+msgstr "Descrizione"
 
 #: invenio_groups/models.py:163
-msgid "Name"
-msgstr ""
-
-#: invenio_groups/models.py:164
-msgid "Required. A name of a group."
-msgstr ""
-
-#: invenio_groups/models.py:171
-msgid "Description"
-msgstr ""
-
-#: invenio_groups/models.py:172
 msgid "Optional. A short description of the group. Default: Empty"
-msgstr ""
+msgstr "Ozionale. Una breve descrizione del gruppo. Per esclusione: Vuoto."
 
-#: invenio_groups/models.py:184
+#: invenio_groups/models.py:175
 msgid "Privacy Policy"
-msgstr ""
+msgstr "Politica di Confidenzialità"
 
-#: invenio_groups/models.py:194
+#: invenio_groups/models.py:185
 msgid "Subscription Policy"
-msgstr ""
+msgstr "Politica di Abbonamento"
 
-#: invenio_groups/models.py:491
+#: invenio_groups/models.py:507
 msgid "Pending admin approval"
-msgstr ""
+msgstr "Approvazione del amministratore in sospeso"
 
-#: invenio_groups/models.py:492
+#: invenio_groups/models.py:508
 msgid "Pending member approval"
-msgstr ""
+msgstr "Approvazione di adesione in sospeso"
 
-#: invenio_groups/models.py:493
+#: invenio_groups/models.py:509
 msgid "Active"
-msgstr ""
+msgstr "Attivo"
 
-#: invenio_groups/templates/groups/helpers_base.html:32
-msgid "Search"
-msgstr ""
-
-#: invenio_groups/templates/groups/new_base.html:31
-#: invenio_groups/views/settings.py:219 invenio_groups/views/settings.py:222
-msgid "Members"
-msgstr ""
-
-#: invenio_groups/templates/groups/new_base.html:50
-#: invenio_groups/templates/groups/new_base.html:83
-msgid "Delete"
-msgstr ""
-
-#: invenio_groups/templates/groups/new_base.html:54
-msgid "Update"
-msgstr ""
-
-#: invenio_groups/templates/groups/new_base.html:54
-msgid "Create"
-msgstr ""
-
-#: invenio_groups/templates/groups/new_base.html:57
-#: invenio_groups/templates/groups/new_base.html:79
-msgid "Cancel"
-msgstr ""
-
-#: invenio_groups/templates/groups/new_base.html:68
-msgid "Group deletion"
-msgstr ""
-
-#: invenio_groups/templates/groups/new_base.html:71
-msgid "You are about to "
-msgstr ""
-
-#: invenio_groups/templates/groups/new_base.html:72
-msgid "delete"
-msgstr ""
-
-#: invenio_groups/templates/groups/new_base.html:75
-msgid "This action cannot be undone. Are you sure you want to proceed?"
-msgstr ""
-
-#: invenio_groups/views/settings.py:67
+#: invenio_groups/views.py:63
 #, python-format
 msgid "%(icon)s My Groups"
-msgstr ""
+msgstr "%(icon)s I Miei Gruppi"
 
-#: invenio_groups/views/settings.py:71
+#: invenio_groups/views.py:67
 msgid "Groups"
-msgstr ""
+msgstr "Gruppi"
 
-#: invenio_groups/views/settings.py:101
+#: invenio_groups/templates/invenio_groups/index.html:44
+#: invenio_groups/views.py:95
 msgid "Requests"
-msgstr ""
+msgstr "Richieste"
 
-#: invenio_groups/views/settings.py:122
+#: invenio_groups/templates/invenio_groups/index.html:42
+#: invenio_groups/views.py:113
 msgid "Invitations"
-msgstr ""
+msgstr "Inviti"
 
-#: invenio_groups/views/settings.py:142 invenio_groups/views/settings.py:354
+#: invenio_groups/views.py:130 invenio_groups/views.py:402
 msgid "New"
-msgstr ""
+msgstr "Nuovo"
 
-#: invenio_groups/views/settings.py:153
+#: invenio_groups/views.py:140
 #, python-format
 msgid "Group \"%(name)s\" created"
-msgstr ""
+msgstr "Gruppo \"%(name)s\" creato"
 
-#: invenio_groups/views/settings.py:156
+#: invenio_groups/views.py:143
 msgid "Group creation failure"
-msgstr ""
+msgstr "Creazione del gruppo fallita"
 
-#: invenio_groups/views/settings.py:167 invenio_groups/views/settings.py:170
+#: invenio_groups/templates/invenio_groups/index.html:87
+#: invenio_groups/templates/invenio_groups/members.html:32
+#: invenio_groups/views.py:154 invenio_groups/views.py:157
 msgid "Manage"
-msgstr ""
+msgstr "Gestire"
 
-#: invenio_groups/views/settings.py:182
+#: invenio_groups/views.py:169
 #, python-format
 msgid "Group \"%(name)s\" was updated"
-msgstr ""
+msgstr "Gruppo \"%(name)s\" aggiornato"
 
-#: invenio_groups/views/settings.py:211
+#: invenio_groups/views.py:180
+#, python-format
+msgid "You cannot edit group %(group_name)s"
+msgstr "Non puoi modificare il gruppo %(group_name)s"
+
+#: invenio_groups/views.py:207
 #, python-format
 msgid "Successfully removed group \"%(group_name)s\""
-msgstr ""
+msgstr "Il gruppo \"%(group_name)s\" è stato ritirato con succeso"
 
-#: invenio_groups/views/settings.py:265
+#: invenio_groups/views.py:212
+#, python-format
+msgid "You cannot delete the group %(group_name)s"
+msgstr "Non puoi eliminare il gruppo %(group_name)s"
+
+#: invenio_groups/templates/invenio_groups/index.html:64
+#: invenio_groups/templates/invenio_groups/index.html:95
+#: invenio_groups/templates/invenio_groups/new.html:31
+#: invenio_groups/views.py:224 invenio_groups/views.py:227
+msgid "Members"
+msgstr "Membri"
+
+#: invenio_groups/views.py:256
+#, python-format
+msgid "You are not allowed to see members of this group %(group_name)s."
+msgstr "Non ti è permesso vedere i membri del gruppo %(group_name)s."
+
+#: invenio_groups/views.py:279
 #, python-format
 msgid "You have successfully left %(group_name)s group."
-msgstr ""
+msgstr "Hai lasciato il gruppo %(group_name)s con successo."
 
-#: invenio_groups/views/settings.py:284
+#: invenio_groups/views.py:288
+#, python-format
+msgid "You cannot leave the group %(group_name)s"
+msgstr "Non puoi lasciare il gruppo %(group_name)s"
+
+#: invenio_groups/views.py:312
 #, python-format
 msgid "%(user)s accepted to %(name)s group."
-msgstr ""
+msgstr "%(user)s accettato nel gruppo %(name)s."
 
-#: invenio_groups/views/settings.py:305
+#: invenio_groups/views.py:318
+#, python-format
+msgid "You cannot approve memberships for the group %(group_name)s"
+msgstr "Non puoi approvare adesioni per il gruppo %(group_name)s"
+
+#: invenio_groups/views.py:342
 #, python-format
 msgid "User %(user_email)s was removed from %(group_name)s group."
-msgstr ""
+msgstr "L'utente %(user_email)s è stato eliminato del gruppo %(group_name)s."
 
-#: invenio_groups/views/settings.py:324
+#: invenio_groups/views.py:347
+#, python-format
+msgid "You cannot delete users of the group %(group_name)s"
+msgstr "Non puoi eliminare utenti del gruppo %(group_name)s"
+
+#: invenio_groups/views.py:371
 #, python-format
 msgid "You are now part of %(name)s group."
-msgstr ""
+msgstr "Fai addesso parte del gruppo %(name)s."
 
-#: invenio_groups/views/settings.py:346
+#: invenio_groups/views.py:394
 #, python-format
 msgid "You have rejected invitation to %(name)s group."
-msgstr ""
+msgstr "Hai rifiutato l'invito del gruppo %(name)s."
 
-#: invenio_groups/views/settings.py:364
+#: invenio_groups/views.py:413
 msgid "Requests sent!"
-msgstr ""
+msgstr "Richiesta mandata!"
 
+#: invenio_groups/views.py:423
+#, python-format
+msgid ""
+"You cannot invite users or yourself (i.e. join) to the group %(group_name)s"
+msgstr ""
+"Non puoi invitare né utenti né te stesso a unirsi al gruppo %(group_name)s"
+
+#: invenio_groups/templates/invenio_groups/helpers.html:32
+msgid "Search"
+msgstr "Ricerca"
+
+#: invenio_groups/templates/invenio_groups/index.html:30
+msgid "My Groups"
+msgstr "I Miei Gruppi"
+
+#: invenio_groups/templates/invenio_groups/index.html:33
+#: invenio_groups/templates/invenio_groups/index.html:49
+msgid "New group"
+msgstr "Nuovo gruppo"
+
+#: invenio_groups/templates/invenio_groups/index.html:37
+msgid ""
+"List of groups your are currently admin or member of. While being in "
+"particular group you gain special privileges, which enables you to get more "
+"involved in growth of the community."
+msgstr ""
+"Lista dei gruppo di cui sei membro o amministratore. Quando sei in un gruppo"
+" particolare, guadagni alcuni privilegi che ti permettono di essere più "
+"coinvolto nel sviluppo della comunità."
+
+#: invenio_groups/templates/invenio_groups/index.html:51
+msgid "Go ahead and create new group!"
+msgstr "Crea il tuo gruppo!"
+
+#: invenio_groups/templates/invenio_groups/index.html:55
+msgid "No results found."
+msgstr "Nessun risultato."
+
+#: invenio_groups/templates/invenio_groups/index.html:82
+msgid "Leave"
+msgstr "Lasciare"
+
+#: invenio_groups/templates/invenio_groups/index.html:90
+#: invenio_groups/templates/invenio_groups/members.html:33
+#: invenio_groups/templates/invenio_groups/new_member.html:45
+msgid "Invite"
+msgstr "Invita"
+
+#: invenio_groups/templates/invenio_groups/members.html:42
+msgid "No results found"
+msgstr "Nessun risultato"
+
+#: invenio_groups/templates/invenio_groups/members.html:50
+msgid "Username"
+msgstr "Nome utente"
+
+#: invenio_groups/templates/invenio_groups/members.html:51
+msgid "Email"
+msgstr "Email"
+
+#: invenio_groups/templates/invenio_groups/members.html:54
+#: invenio_groups/templates/invenio_groups/members.html:56
+msgid "Status"
+msgstr "Stato"
+
+#: invenio_groups/templates/invenio_groups/members.html:71
+msgid "Remove"
+msgstr "Elimina"
+
+#: invenio_groups/templates/invenio_groups/members.html:74
+msgid "Revoke"
+msgstr "Revoca"
+
+#: invenio_groups/templates/invenio_groups/new.html:50
+#: invenio_groups/templates/invenio_groups/new.html:83
+msgid "Delete"
+msgstr "Cancella"
+
+#: invenio_groups/templates/invenio_groups/new.html:54
+msgid "Update"
+msgstr "Aggiorna"
+
+#: invenio_groups/templates/invenio_groups/new.html:54
+msgid "Create"
+msgstr "Crea"
+
+#: invenio_groups/templates/invenio_groups/new.html:57
+#: invenio_groups/templates/invenio_groups/new.html:79
+#: invenio_groups/templates/invenio_groups/new_member.html:42
+msgid "Cancel"
+msgstr "Annulla"
+
+#: invenio_groups/templates/invenio_groups/new.html:68
+msgid "Group deletion"
+msgstr "Cancella il gruppo"
+
+#: invenio_groups/templates/invenio_groups/new.html:71
+msgid "You are about to "
+msgstr "Stai per"
+
+#: invenio_groups/templates/invenio_groups/new.html:72
+msgid "delete"
+msgstr "cancellare"
+
+#: invenio_groups/templates/invenio_groups/new.html:75
+msgid "This action cannot be undone. Are you sure you want to proceed?"
+msgstr ""
+"Quest'operazione non può essere annulata. Sei sicuro di voler procedere?"
+
+#: invenio_groups/templates/invenio_groups/new_member.html:33
+msgid ""
+"Specifies email addresses of the users you would like to add to your group. "
+"Each user will be sent invitation."
+msgstr ""
+"Specifica l'indirizzo email degli utenti che voresti aggiungere al tuo "
+"gruppo. Ogni utente ricevere un invito."
+
+#: invenio_groups/templates/invenio_groups/paginate.html:97
+#, python-format
+msgid "Displaying items %(start)d - %(stop)d out of %(total)d"
+msgstr "Visualizzando elementi %(start)d - %(stop)d su %(total)d"
+
+#: invenio_groups/templates/invenio_groups/pending.html:30
+msgid "Pending invitations"
+msgstr "Inviti in sospeso"
+
+#: invenio_groups/templates/invenio_groups/pending.html:30
+msgid "Pending requests"
+msgstr "Richieste in sospeso"
+
+#: invenio_groups/templates/invenio_groups/pending.html:36
+msgid ""
+"Invitations you received from communities admins. Click accept in order to "
+"become a member of the particular team or reject to cancel a pending "
+"invitation."
+msgstr ""
+"Inviti ricevuti da amministratori di comunità. Fai click su acceta per "
+"unirti al gruppo o rifuta per cancellare l'invito."
+
+#: invenio_groups/templates/invenio_groups/pending.html:50
+msgid "Group"
+msgstr "Gruppo"
+
+#: invenio_groups/templates/invenio_groups/pending.html:52
+msgid "User"
+msgstr "Utente"
+
+#: invenio_groups/templates/invenio_groups/pending.html:74
+msgid "Reject"
+msgstr "Rifuta"
+
+#: invenio_groups/templates/invenio_groups/pending.html:81
+msgid "Accept"
+msgstr "Accetta"

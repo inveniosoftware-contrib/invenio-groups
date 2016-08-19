@@ -1,18 +1,20 @@
-# German translations for invenio-groups.
-# Copyright (C) 2015 ORGANIZATION
+# Danish translations for invenio-groups.
+# Copyright (C) 2016 CERN
 # This file is distributed under the same license as the invenio-groups
 # project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
 #
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: invenio-groups 0.1.2\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"Project-Id-Version: invenio-groups 1.0.0.dev20160000\n"
+"Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
 "POT-Creation-Date: 2016-08-19 11:14+0200\n"
-"PO-Revision-Date: 2015-08-04 19:58+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: de\n"
-"Language-Team: de <LL@li.org>\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Alizee Pace <alizee.pace@gmail.com>, 2016\n"
+"Language: da\n"
+"Language-Team: Danish "
+"(https://www.transifex.com/inveniosoftware/teams/23537/da/)\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -131,7 +133,7 @@ msgstr ""
 
 #: invenio_groups/views.py:130 invenio_groups/views.py:402
 msgid "New"
-msgstr ""
+msgstr "Ny"
 
 #: invenio_groups/views.py:140
 #, python-format
@@ -275,7 +277,7 @@ msgstr ""
 
 #: invenio_groups/templates/invenio_groups/members.html:50
 msgid "Username"
-msgstr ""
+msgstr "Brugernavn"
 
 #: invenio_groups/templates/invenio_groups/members.html:51
 msgid "Email"
@@ -284,7 +286,7 @@ msgstr ""
 #: invenio_groups/templates/invenio_groups/members.html:54
 #: invenio_groups/templates/invenio_groups/members.html:56
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #: invenio_groups/templates/invenio_groups/members.html:71
 msgid "Remove"
@@ -311,7 +313,7 @@ msgstr ""
 #: invenio_groups/templates/invenio_groups/new.html:79
 #: invenio_groups/templates/invenio_groups/new_member.html:42
 msgid "Cancel"
-msgstr ""
+msgstr "Afbryd"
 
 #: invenio_groups/templates/invenio_groups/new.html:68
 msgid "Group deletion"
