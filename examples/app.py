@@ -43,7 +43,6 @@ import os
 from flask import Flask, current_app
 from flask_babelex import Babel
 from flask_breadcrumbs import Breadcrumbs
-from flask_cli import FlaskCLI
 from flask_menu import Menu
 from flask_security.utils import encrypt_password
 from invenio_accounts import InvenioAccounts, views
@@ -65,7 +64,6 @@ app.config.update(
     MAIL_SUPPRESS_SEND=True,
     SECRET_KEY='changeme',
 )
-FlaskCLI(app)
 Babel(app)
 Menu(app)
 Breadcrumbs(app)

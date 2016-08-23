@@ -35,7 +35,6 @@ import pytest
 from flask import Flask
 from flask_babelex import Babel
 from flask_breadcrumbs import Breadcrumbs
-from flask_cli import FlaskCLI
 from flask_menu import Menu
 from invenio_accounts import InvenioAccounts
 from invenio_accounts.models import User
@@ -63,7 +62,6 @@ def app(request):
         WTF_CSRF_ENABLED=False,
     )
     Babel(app)
-    FlaskCLI(app)
     Menu(app)
     Breadcrumbs(app)
     InvenioDB(app)
