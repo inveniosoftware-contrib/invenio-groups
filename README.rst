@@ -46,4 +46,4 @@ Invenio module that adds support for user groups.
 *This is an experimental developer preview release.*
 
 * Free software: GPLv2 license
-* Documentation: https://pythonhosted.org/invenio-groups/
+* Documentation: https://invenio-groups.readthedocs.io/
