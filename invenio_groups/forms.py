@@ -22,7 +22,7 @@
 from __future__ import absolute_import, print_function
 
 from flask_babelex import gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from sqlalchemy_utils.types.choice import ChoiceType
 from wtforms import RadioField, TextAreaField
 from wtforms.validators import DataRequired, Email, StopValidation, \
@@ -31,7 +31,7 @@ from wtforms_alchemy import ClassMap, model_form_factory
 
 from .models import Group
 
-ModelForm = model_form_factory(Form)
+ModelForm = model_form_factory(FlaskForm)
 
 
 class EmailsValidator(object):
@@ -75,7 +75,7 @@ class GroupForm(ModelForm):
         ]
 
 
-class NewMemberForm(Form):
+class NewMemberForm(FlaskForm):
     """For for adding new members to a group."""
 
     emails = TextAreaField(
